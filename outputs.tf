@@ -7,5 +7,5 @@ output "project_id" {
 }
 
 output "role_arn" {
-  value = "${aws_iam_role.default.arn}"
+  value = "${aws_iam_role.default.id}"
 }
