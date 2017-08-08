@@ -10,7 +10,7 @@ Include this repository as a module in your existing terraform code:
 module "build" {
   source    = "git::https://github.com/cloudposse/tf_codebuild.git"
   namespace = "general"
-  name      = "step-build"
+  name      = "ci"
   stage     = "staging"
 
   image         = "apline"
