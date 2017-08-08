@@ -9,3 +9,10 @@ variable "stage" {
 variable "name" {
   default = "codebuild"
 }
+
+
+variable "image" {}
+
+variable "instance_size" {
+  default = "BUILD_GENERAL1_SMALL"
+}

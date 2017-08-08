@@ -5,3 +5,7 @@ output "project_name" {
 output "project_id" {
   value = "${aws_codebuild_project.default.id}"
 }
+
+output "role_arn" {
+  value = "${aws_iam_policy.default.arn}"
+}
