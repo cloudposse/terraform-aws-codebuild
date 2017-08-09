@@ -29,18 +29,18 @@ resource "aws_iam_role_policy_attachment" "codebuild_s3" {
 
 ## Input
 
-|      Name     |        Default       |                                                    Decription                                                    |
-|:-------------:|:--------------------:|:----------------------------------------------------------------------------------------------------------------:|
-|   namespace   |        global        |                                                     Namespace                                                    |
-|     stage     |        default       |                                                      Stage                                                       |
-|      name     |       codebuild      |                                                       Name                                                       |
-|     image     |        alpine        |                                         Docker image used as environment                                         |
-| instance_size | BUILD_GENERAL1_SMALL |  Instance size for job.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE```|
+| Name | Default | Decription |
+|:---:|:---:|:---:|
+| namespace | global | Namespace |
+| stage | default | Stage |
+| name | codebuild | Name |
+| image | alpine | Docker image used as environment |
+| instance_size | BUILD_GENERAL1_SMALL |  Instance size for job.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE``` |
 
 ## Output
 
-|     Name     |       Decription       |
-|:------------:|:----------------------:|
+| Name | Decription |
+|:---:|:---:|
 | project_name | CodeBuild project name |
-|  project_id  |  CodeBuild project arn |
-|   role_arn   |      IAM Role arn      |
+| project_id | CodeBuild project arn |
+| role_arn | IAM Role arn |
