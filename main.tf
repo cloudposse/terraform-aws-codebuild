@@ -7,7 +7,7 @@ module "label" {
 }
 
 resource "aws_iam_role" "default" {
-  name = "${module.label.id}"
+  name               = "${module.label.id}"
   assume_role_policy = "${data.aws_iam_policy_document.role.json}"
 }
 
@@ -29,8 +29,8 @@ data "aws_iam_policy_document" "role" {
 }
 
 resource "aws_iam_policy" "default" {
-  name = "${module.label.id}"
-  path = "/service-role/"
+  name   = "${module.label.id}"
+  path   = "/service-role/"
   policy = "${data.aws_iam_policy_document.logs.json}"
 }
 
@@ -41,25 +41,25 @@ data "aws_iam_policy_document" "logs" {
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
     ]
 
     effect = "Allow"
 
     resources = [
-      "*"
+      "*",
     ]
   }
 }
 
 resource "aws_iam_policy_attachment" "default" {
-  name = "${module.label.id}"
+  name       = "${module.label.id}"
   policy_arn = "${aws_iam_policy.default.arn}"
   roles      = ["${aws_iam_role.default.id}"]
 }
 
 resource "aws_codebuild_project" "default" {
-  name = "${module.label.id}"
+  name         = "${module.label.id}"
   service_role = "${aws_iam_role.default.arn}"
 
   artifacts {
@@ -73,7 +73,7 @@ resource "aws_codebuild_project" "default" {
   }
 
   source {
-    type     = "CODEPIPELINE"
+    type = "CODEPIPELINE"
   }
 
   tags = "${module.label.tags}"
