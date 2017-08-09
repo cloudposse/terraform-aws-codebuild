@@ -18,7 +18,7 @@ module "build" {
 }
 ```
 
-Grant propriate permsissions to s3
+Grant appropriate permsissions to s3
 
 ```
 resource "aws_iam_role_policy_attachment" "codebuild_s3" {
