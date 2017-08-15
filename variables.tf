@@ -17,3 +17,8 @@ variable "image" {
 variable "instance_size" {
   default = "BUILD_GENERAL1_SMALL"
 }
+
+variable "buildspec" {
+  default     = ""
+  description = "Optional buildspec declaration to use for building the project"
+}

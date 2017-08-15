@@ -73,7 +73,8 @@ resource "aws_codebuild_project" "default" {
   }
 
   source {
-    type = "CODEPIPELINE"
+    buildspec = "${var.buildspec}"
+    type      = "CODEPIPELINE"
   }
 
   tags = "${module.label.tags}"
