@@ -36,6 +36,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_s3" {
 | name          | codebuild            | Name                                                                                                                           |
 | image         | alpine               | Docker image used as environment                                                                                               |
 | instance_size | BUILD_GENERAL1_SMALL | Instance size for job.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE``` |
+| buildspec     | ""                   | Optional buildspec declaration to use for building the project                                                                 |
 
 ## Output
 
