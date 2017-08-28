@@ -22,3 +22,18 @@ variable "buildspec" {
   default     = ""
   description = "Optional buildspec declaration to use for building the project"
 }
+
+variable "delimiter" {
+  type    = "string"
+  default = "-"
+}
+
+variable "attributes" {
+  type    = "list"
+  default = []
+}
+
+variable "tags" {
+  type    = "map"
+  default = {}
+}
