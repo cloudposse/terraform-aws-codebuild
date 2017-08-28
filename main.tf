@@ -47,21 +47,21 @@ data "aws_iam_policy_document" "permissions" {
       "ecr:GetAuthorizationToken",
       "ecr:InitiateLayerUpload",
       "ecr:PutImage",
-      "ecr:UploadLayerPart"
+      "ecr:UploadLayerPart",
     ]
 
     effect = "Allow"
 
     resources = [
-      "*"
+      "*",
     ]
   }
 }
 
-resource "aws_iam_policy_attachment" "default" {
+resource "aws_iam_role_policy_attachment" "default" {
   name       = "${module.label.id}"
   policy_arn = "${aws_iam_policy.default.arn}"
-  roles      = ["${aws_iam_role.default.id}"]
+  role       = "${aws_iam_role.default.id}"
 }
 
 resource "aws_codebuild_project" "default" {
