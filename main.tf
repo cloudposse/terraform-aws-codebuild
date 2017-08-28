@@ -1,9 +1,12 @@
 # Define composite variables for resources
 module "label" {
-  source    = "git::https://github.com/cloudposse/tf_label.git?ref=tags/0.2.0"
-  namespace = "${var.namespace}"
-  name      = "${var.name}"
-  stage     = "${var.stage}"
+  source     = "git::https://github.com/cloudposse/tf_label.git?ref=tags/0.2.0"
+  namespace  = "${var.namespace}"
+  name       = "${var.name}"
+  stage      = "${var.stage}"
+  delimiter  = "${var.delimiter}"
+  attributes = "${var.attributes}"
+  tags       = "${var.tags}"
 }
 
 resource "aws_iam_role" "default" {
