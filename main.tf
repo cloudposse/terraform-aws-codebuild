@@ -31,10 +31,10 @@ data "aws_iam_policy_document" "role" {
 resource "aws_iam_policy" "default" {
   name   = "${module.label.id}"
   path   = "/service-role/"
-  policy = "${data.aws_iam_policy_document.logs.json}"
+  policy = "${data.aws_iam_policy_document.permissions.json}"
 }
 
-data "aws_iam_policy_document" "logs" {
+data "aws_iam_policy_document" "permissions" {
   statement {
     sid = ""
 
@@ -42,12 +42,18 @@ data "aws_iam_policy_document" "logs" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:CompleteLayerUpload",
+      "ecr:GetAuthorizationToken",
+      "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart"
     ]
 
     effect = "Allow"
 
     resources = [
-      "*",
+      "*"
     ]
   }
 }
