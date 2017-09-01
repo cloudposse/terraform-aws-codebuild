@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 # Define composite variables for resources
 module "label" {
   source     = "git::https://github.com/cloudposse/tf_label.git?ref=tags/0.2.0"
@@ -87,7 +89,7 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       "name"  = "AWS_ACCOUNT_ID"
-      "value" = "${var.aws_account_id}"
+      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.current.account_id}"
     }
 
     environment_variable {
