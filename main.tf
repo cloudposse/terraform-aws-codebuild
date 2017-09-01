@@ -1,5 +1,9 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {
+  current = true
+}
+
 # Define composite variables for resources
 module "label" {
   source     = "git::https://github.com/cloudposse/tf_label.git?ref=tags/0.2.0"
@@ -84,7 +88,7 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       "name"  = "AWS_REGION"
-      "value" = "${var.aws_region}"
+      "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.current.name}"
     }
 
     environment_variable {
