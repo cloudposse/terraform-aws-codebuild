@@ -48,10 +48,10 @@ resource "aws_iam_role_policy_attachment" "codebuild_s3" {
 | name            | codebuild            | Name                                                                                                                                                 |
 | image           | ""                   | Docker image used for build environment, _e.g._ `aws/codebuild/docker:1.12.1` or `aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0`               |
 | instance_size   | BUILD_GENERAL1_SMALL | CodeBuild instance size.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE```                     |
-| buildspec       | ""                   | Optional buildspec declaration to use for building the project                                                                                       |
+| buildspec       | ""                   | (Optional) `buildspec` declaration to use for building the project                                                                                       |
 | privileged_mode | ""                   | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the `CodeBuild` instance. Used when building Docker images |
-| aws_region      | ""                   | (Optional) AWS Region for the ECR repository, _e.g._ `us-east-1`. Used as `CodeBuild` ENV variable when building Docker images                       |
-| aws_account_id  | ""                   | (Optional) AWS Account ID that owns the ECR repository. Used as `CodeBuild` ENV variable when building Docker images                                 |
+| aws_region      | ""                   | (Optional) AWS Region, _e.g._ `us-east-1`. Used as `CodeBuild` ENV variable when building Docker images                                              |
+| aws_account_id  | ""                   | (Optional) AWS Account ID. Used as `CodeBuild` ENV variable when building Docker images                                                              |
 | image_repo_name | ""                   | (Optional) ECR repository name to store Docker images. Used as `CodeBuild` ENV variable when building Docker images                                  |
 | image_tag       | ""                   | (Optional) Docker image tag in the ECR repository, _e.g._ `latest`. Used as `CodeBuild` ENV variable when building Docker images                     |
 
