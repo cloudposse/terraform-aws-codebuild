@@ -62,7 +62,6 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  name       = "${module.label.id}"
   policy_arn = "${aws_iam_policy.default.arn}"
   role       = "${aws_iam_role.default.id}"
 }
@@ -76,9 +75,10 @@ resource "aws_codebuild_project" "default" {
   }
 
   environment {
-    compute_type = "${var.instance_size}"
-    image        = "${var.image}"
-    type         = "LINUX_CONTAINER"
+    compute_type    = "${var.instance_size}"
+    image           = "${var.image}"
+    type            = "LINUX_CONTAINER"
+    privileged_mode = true
   }
 
   source {
