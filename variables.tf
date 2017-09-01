@@ -37,3 +37,27 @@ variable "tags" {
   type    = "map"
   default = {}
 }
+
+variable "privileged_mode" {
+  default = false
+}
+
+variable "aws_region" {
+  type    = "string"
+  default = ""
+}
+
+variable "aws_account_id" {
+  type    = "string"
+  default = ""
+}
+
+variable "image_repo_name" {
+  type    = "string"
+  default = ""
+}
+
+variable "image_tag" {
+  type    = "string"
+  default = ""
+}

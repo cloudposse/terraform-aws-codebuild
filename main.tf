@@ -78,7 +78,27 @@ resource "aws_codebuild_project" "default" {
     compute_type    = "${var.instance_size}"
     image           = "${var.image}"
     type            = "LINUX_CONTAINER"
-    privileged_mode = true
+    privileged_mode = "${var.privileged_mode}"
+
+    environment_variable {
+      "name"  = "AWS_REGION"
+      "value" = "${var.aws_region}"
+    }
+
+    environment_variable {
+      "name"  = "AWS_ACCOUNT_ID"
+      "value" = "${var.aws_account_id}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_REPO_NAME"
+      "value" = "${var.image_repo_name}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_TAG"
+      "value" = "${var.image_tag}"
+    }
   }
 
   source {
