@@ -30,14 +30,6 @@ module "build" {
 }
 ```
 
-Grant the required permissions to s3
-
-```
-resource "aws_iam_role_policy_attachment" "codebuild_s3" {
-  role   = "${module.build.role_arn}"
-  policy_arn = "${aws_iam_policy.s3.arn}"
-}
-```
 
 
 ## Input
