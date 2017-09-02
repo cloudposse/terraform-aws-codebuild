@@ -1,3 +1,9 @@
+data "aws_caller_identity" "default" {}
+
+data "aws_region" "default" {
+  current = true
+}
+
 # Define composite variables for resources
 module "label" {
   source     = "git::https://github.com/cloudposse/tf_label.git?ref=tags/0.2.0"
@@ -75,10 +81,30 @@ resource "aws_codebuild_project" "default" {
   }
 
   environment {
-    compute_type    = "${var.instance_size}"
-    image           = "${var.image}"
+    compute_type    = "${var.build_compute_type}"
+    image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
-    privileged_mode = true
+    privileged_mode = "${var.privileged_mode}"
+
+    environment_variable {
+      "name"  = "AWS_REGION"
+      "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
+    }
+
+    environment_variable {
+      "name"  = "AWS_ACCOUNT_ID"
+      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_REPO_NAME"
+      "value" = "${var.image_repo_name}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_TAG"
+      "value" = "${var.image_tag}"
+    }
   }
 
   source {
