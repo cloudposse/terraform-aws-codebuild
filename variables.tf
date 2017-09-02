@@ -11,7 +11,6 @@ variable "name" {
 }
 
 variable "image" {
-  default = ""
 }
 
 variable "instance_size" {
