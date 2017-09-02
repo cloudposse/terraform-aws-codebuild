@@ -13,7 +13,8 @@ module "build" {
     name                = "ci"
     stage               = "staging"
     
-    image               = "aws/codebuild/docker:1.12.1"
+    # http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html
+    build_image         = "aws/codebuild/docker:1.12.1"
     instance_size       = "BUILD_GENERAL1_SMALL"
     
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
@@ -46,9 +47,9 @@ resource "aws_iam_role_policy_attachment" "codebuild_s3" {
 | namespace       | global               | Namespace                                                                                                                                            |
 | stage           | default              | Stage                                                                                                                                                |
 | name            | codebuild            | Name                                                                                                                                                 |
-| image           | ""                   | Docker image used for build environment, _e.g._ `aws/codebuild/docker:1.12.1` or `aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0`               |
+| build_image     | (Required)           | Docker image for build environment, _e.g._ `aws/codebuild/docker:1.12.1` or `aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0`                    |
 | instance_size   | BUILD_GENERAL1_SMALL | CodeBuild instance size.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE```                     |
-| buildspec       | ""                   | (Optional) `buildspec` declaration to use for building the project                                                                                       |
+| buildspec       | ""                   | (Optional) `buildspec` declaration to use for building the project                                                                                   |
 | privileged_mode | ""                   | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the `CodeBuild` instance. Used when building Docker images |
 | aws_region      | ""                   | (Optional) AWS Region, _e.g._ `us-east-1`. Used as `CodeBuild` ENV variable when building Docker images                                              |
 | aws_account_id  | ""                   | (Optional) AWS Account ID. Used as `CodeBuild` ENV variable when building Docker images                                                              |
