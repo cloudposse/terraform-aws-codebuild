@@ -81,7 +81,7 @@ resource "aws_codebuild_project" "default" {
   }
 
   environment {
-    compute_type    = "${var.instance_size}"
+    compute_type    = "${var.build_compute_type}"
     image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"

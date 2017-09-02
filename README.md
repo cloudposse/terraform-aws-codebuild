@@ -15,7 +15,7 @@ module "build" {
     
     # http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html
     build_image         = "aws/codebuild/docker:1.12.1"
-    instance_size       = "BUILD_GENERAL1_SMALL"
+    build_compute_type  = "BUILD_GENERAL1_SMALL"
     
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
     # For more info:

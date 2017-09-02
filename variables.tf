@@ -12,7 +12,7 @@ variable "name" {
 
 variable "build_image" {}
 
-variable "instance_size" {
+variable "build_compute_type" {
   default = "BUILD_GENERAL1_SMALL"
 }
 
