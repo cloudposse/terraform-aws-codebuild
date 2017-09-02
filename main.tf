@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "permissions" {
     effect = "Allow"
 
     resources = [
-      "*",
+      "*"
     ]
   }
 }
@@ -82,7 +82,7 @@ resource "aws_codebuild_project" "default" {
 
   environment {
     compute_type    = "${var.instance_size}"
-    image           = "${var.image}"
+    image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
 
