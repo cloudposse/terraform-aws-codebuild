@@ -1,14 +1,14 @@
-# tf_codebuild
+# terraform-aws-codebuild
 
-Terraform config to create codebuild project for codepipeline
+Terraform module to create AWS CodeBuild project for AWS CodePipeline
 
 ## Usage
 
 Include this repository as a module in your existing terraform code:
 
-```
+```hcl
 module "build" {
-    source              = "git::https://github.com/cloudposse/tf_codebuild.git?ref=tags/0.5.0"
+    source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
     namespace           = "general"
     name                = "ci"
     stage               = "staging"
@@ -22,14 +22,13 @@ module "build" {
     # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
     # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
     
-    privileged_mode     = true
+    privileged_mode     = "true"
     aws_region          = "us-east-1"
     aws_account_id      = "xxxxxxxxxx"
     image_repo_name     = "ecr-repo-name"
     image_tag           = "latest"
 }
 ```
-
 
 
 ## Input
@@ -57,3 +56,8 @@ module "build" {
 | project_name | CodeBuild project name |
 | project_id   | CodeBuild project ARN  |
 | role_arn     | IAM Role ARN           |
+
+
+## License
+
+Apache 2 License. See [`LICENSE`](LICENSE) for full details.
