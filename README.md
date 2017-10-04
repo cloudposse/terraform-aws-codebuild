@@ -44,8 +44,8 @@ module "build" {
 | privileged_mode     | ""                           | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the `CodeBuild` instance. Used when building Docker images |
 | aws_region          | ""                           | (Optional) AWS Region, _e.g._ `us-east-1`. Used as `CodeBuild` ENV variable when building Docker images                                              |
 | aws_account_id      | ""                           | (Optional) AWS Account ID. Used as `CodeBuild` ENV variable when building Docker images                                                              |
-| image_repo_name     | ""                           | (Optional) ECR repository name to store the Docker image built by this module. Used as `CodeBuild` ENV variable when building Docker images          |
-| image_tag           | ""                           | (Optional) Docker image tag in the ECR repository, _e.g._ `latest`. Used as `CodeBuild` ENV variable when building Docker images                     |
+| image_repo_name     | "UNSET"                      | (Optional) ECR repository name to store the Docker image built by this module. Used as `CodeBuild` ENV variable when building Docker images          |
+| image_tag           | "latest"                     | (Optional) Docker image tag in the ECR repository, _e.g._ `latest`. Used as `CodeBuild` ENV variable when building Docker images                     |
 
 
 
