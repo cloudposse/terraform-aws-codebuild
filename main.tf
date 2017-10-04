@@ -6,7 +6,7 @@ data "aws_region" "default" {
 
 # Define composite variables for resources
 module "label" {
-  source    = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.2.1"
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.2.1"
   namespace  = "${var.namespace}"
   name       = "${var.name}"
   stage      = "${var.stage}"
@@ -98,12 +98,12 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       "name"  = "IMAGE_REPO_NAME"
-      "value" = "${var.image_repo_name}"
+      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
     }
 
     environment_variable {
       "name"  = "IMAGE_TAG"
-      "value" = "${var.image_tag}"
+      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
     }
   }
 
