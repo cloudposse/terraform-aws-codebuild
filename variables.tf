@@ -29,6 +29,12 @@ variable "delimiter" {
   default = "-"
 }
 
+variable "envvars" {
+  type = "list"
+  default = []
+  description = "List of objects with fiels { name, value }"
+}
+
 variable "attributes" {
   type    = "list"
   default = []
