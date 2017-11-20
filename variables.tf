@@ -29,12 +29,6 @@ variable "delimiter" {
   default = "-"
 }
 
-variable "envvars" {
-  type = "list"
-  default = []
-  description = "List of objects with fiels { name, value }"
-}
-
 variable "attributes" {
   type    = "list"
   default = []
@@ -48,6 +42,11 @@ variable "tags" {
 variable "privileged_mode" {
   default     = "false"
   description = "(Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images"
+}
+
+variable "github_token" {
+  default = ""
+  description = "(Optional) Github auth token used as GITHUB_TOKEN env var"
 }
 
 variable "aws_region" {

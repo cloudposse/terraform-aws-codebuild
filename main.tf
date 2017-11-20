@@ -86,7 +86,30 @@ resource "aws_codebuild_project" "default" {
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
 
-    environment_variable = ["${concat(var.envvars, local.default_envvars)}"]
+    environment_variable {
+      "name"  = "AWS_REGION"
+      "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
+    }
+
+    environment_variable {
+      "name"  = "AWS_ACCOUNT_ID"
+      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_REPO_NAME"
+      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_TAG"
+      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
+    }
+
+    environment_variable {
+      "name"  = "GITHUB_TOKEN"
+      "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
+    }
   }
 
   source {
