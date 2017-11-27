@@ -45,7 +45,7 @@ variable "privileged_mode" {
 }
 
 variable "github_token" {
-  default = ""
+  default     = ""
   description = "(Optional) GitHub auth token environment variable (GITHUB_TOKEN)"
 }
 
