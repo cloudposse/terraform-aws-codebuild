@@ -108,7 +108,7 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       "name"  = "GITHUB_TOKEN"
-      "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
+      "value" = "${var.github_token}"
     }
   }
 
