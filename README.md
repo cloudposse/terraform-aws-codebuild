@@ -46,7 +46,7 @@ module "build" {
 | aws_account_id      | ""                           | (Optional) AWS Account ID. Used as `CodeBuild` ENV variable when building Docker images                                                              |
 | image_repo_name     | "UNSET"                      | (Optional) ECR repository name to store the Docker image built by this module. Used as `CodeBuild` ENV variable when building Docker images          |
 | image_tag           | "latest"                     | (Optional) Docker image tag in the ECR repository, _e.g._ `latest`. Used as `CodeBuild` ENV variable when building Docker images                     |
-| github_token        | ""                           | (Optional) GitHub auth token environment variable (GITHUB_TOKEN)                                                                                     |
+| github_token        | ""                           | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)                                                                                     |
 
 
 

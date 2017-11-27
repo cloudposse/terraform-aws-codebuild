@@ -46,7 +46,7 @@ variable "privileged_mode" {
 
 variable "github_token" {
   default     = ""
-  description = "(Optional) GitHub auth token environment variable (GITHUB_TOKEN)"
+  description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
 }
 
 variable "aws_region" {
