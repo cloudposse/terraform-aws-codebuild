@@ -105,6 +105,11 @@ resource "aws_codebuild_project" "default" {
       "name"  = "IMAGE_TAG"
       "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
     }
+
+    environment_variable {
+      "name"  = "GITHUB_TOKEN"
+      "value" = "${var.github_token}"
+    }
   }
 
   source {
