@@ -1,4 +1,4 @@
-# terraform-aws-codebuild
+# terraform-aws-codebuild [![Build Status](https://travis-ci.org/cloudposse/terraform-aws-codebuild.svg)](https://travis-ci.org/cloudposse/terraform-aws-codebuild)
 
 Terraform module to create AWS CodeBuild project for AWS CodePipeline
 
