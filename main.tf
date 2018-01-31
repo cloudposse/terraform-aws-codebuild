@@ -107,6 +107,11 @@ resource "aws_codebuild_project" "default" {
     }
 
     environment_variable {
+      "name"  = "STAGE"
+      "value" = "${var.stage}"
+    }
+
+    environment_variable {
       "name"  = "GITHUB_TOKEN"
       "value" = "${var.github_token}"
     }
