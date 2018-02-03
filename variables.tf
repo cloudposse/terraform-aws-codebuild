@@ -49,6 +49,26 @@ variable "github_token" {
   description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
 }
 
+variable "jenkins_url" {
+  default     = ""
+  description = "(Optional) Jenkins URL when used with Terraform AWS Jenkins module (`JENKINS_URL`)"
+}
+
+variable "company_name" {
+  default     = ""
+  description = "(Optional) Company name when used with Terraform AWS Jenkins module (`COMPANY_NAME`)"
+}
+
+variable "country_code" {
+  default     = ""
+  description = "(Optional) Country code when used with Terraform AWS Jenkins module (`COUNTRY_CODE`)"
+}
+
+variable "time_zone" {
+  default     = ""
+  description = "(Optional) Time zone when used with Terraform AWS Jenkins module (`TIME_ZONE`)"
+}
+
 variable "aws_region" {
   type        = "string"
   default     = ""
