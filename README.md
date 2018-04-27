@@ -12,16 +12,16 @@ module "build" {
     namespace           = "general"
     name                = "ci"
     stage               = "staging"
-    
+
     # http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html
     build_image         = "aws/codebuild/docker:1.12.1"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
-    
+
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
     # For more info:
     # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
     # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
-    
+
     privileged_mode     = "true"
     aws_region          = "us-east-1"
     aws_account_id      = "xxxxxxxxxx"
@@ -47,7 +47,10 @@ module "build" {
 | image_repo_name     | "UNSET"                      | (Optional) ECR repository name to store the Docker image built by this module. Used as `CodeBuild` ENV variable when building Docker images          |
 | image_tag           | "latest"                     | (Optional) Docker image tag in the ECR repository, _e.g._ `latest`. Used as `CodeBuild` ENV variable when building Docker images                     |
 | github_token        | ""                           | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)                                                                                     |
-
+| jenkins_url         | ""                           | (Optional) Jenkins URL when used with Terraform AWS Jenkins module (`JENKINS_URL`)                                                                                     |
+| company_name        | ""                           | (Optional) Company name when used with Terraform AWS Jenkins module (`COMPANY_NAME`)                                                                                     |
+| country_code        | ""                           | (Optional) Country code when used with Terraform AWS Jenkins module (`COUNTRY_CODE`)                                                                                     |
+| time_zone           | ""                           | (Optional) Time zone when used with Terraform AWS Jenkins module (`TIME_ZONE`)                                                                                     |
 
 
 ## Output

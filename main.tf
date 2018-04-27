@@ -113,6 +113,26 @@ resource "aws_codebuild_project" "default" {
       "name"  = "GITHUB_TOKEN"
       "value" = "${var.github_token}"
     }
+
+    environment_variable {
+      "name"  = "JENKINS_URL"
+      "value" = "${var.jenkins_url}"
+    }
+
+    environment_variable {
+      "name"  = "COMPANY_NAME"
+      "value" = "${var.company_name}"
+    }
+
+    environment_variable {
+      "name"  = "COUNTRY_CODE"
+      "value" = "${var.country_code}"
+    }
+
+    environment_variable {
+      "name"  = "TIME_ZONE"
+      "value" = "${var.time_zone}"
+    }
   }
 
   source {
