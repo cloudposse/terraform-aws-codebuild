@@ -26,11 +26,6 @@ resource "aws_s3_bucket" "cache_bucket" {
     prefix  = "/"
     tags = "${module.label.tags}"
 
-    transition {
-      days = 15
-      storage_class = "ONEZONE_IA"
-    }
-
     expiration {
       days = "${var.cache_timeout}"
     }
@@ -42,11 +37,13 @@ locals {
   b_name = "${module.label.id}"
   b_name_hyphen = "${substr(join("-", split("_", lower(local.b_name))), 0, 20)}"
   cache_def = {
-    type     = "S3"
-    location = "${aws_s3_bucket.cache_bucket.bucket}"
+    "true" = [{
+              type     = "S3"
+              location = "${aws_s3_bucket.cache_bucket.bucket}"
+              }]
+    "false" = [{}]
   }
-  cache_empty = {}
-  cache = ${var.cache == "true" ? local.cache_def : local.cache_empty }
+  cache = "${local.cache_def[var.cache]}"
 }
 
 resource "aws_iam_role" "default" {
@@ -129,7 +126,7 @@ resource "aws_codebuild_project" "default" {
     type = "CODEPIPELINE"
   }
 
-  cache = "${local.cache}"
+  cache = ["${local.cache}"]
 
   environment {
     compute_type    = "${var.build_compute_type}"
