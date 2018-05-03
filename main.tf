@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "cache_bucket" {
     }
 
     expiration {
-      days = ${var.cache_timeout}
+      days = "${var.cache_timeout}"
     }
   }
 
