@@ -10,6 +10,15 @@ variable "name" {
   default = "codebuild"
 }
 
+variable "cache" {
+  default = "true"
+  description = "If cache is true, create an S3 bucket for storing codebuild cache inside"
+}
+variable "cache_timeout" {
+  default = "7"
+  description = "How many days should the build cache be kept."
+}
+
 variable "build_image" {
   default     = "aws/codebuild/docker:1.12.1"
   description = "Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html"

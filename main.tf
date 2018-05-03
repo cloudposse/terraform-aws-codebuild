@@ -13,6 +13,40 @@ module "label" {
   tags       = "${var.tags}"
 }
 
+resource "aws_s3_bucket" "cache_bucket" {
+  bucket_prefix = "${local.b_name_hyphen}"
+  acl    = "private"
+  force_destroy = true
+  tags = "${module.label.tags}"
+
+  lifecycle_rule {
+    id      = "codebuildcache"
+    enabled = true
+
+    prefix  = "/"
+    tags = "${module.label.tags}"
+
+    transition {
+      days = 15
+      storage_class = "ONEZONE_IA"
+    }
+
+    expiration {
+      days = ${var.cache_timeout}
+    }
+  }
+
+}
+
+locals {
+  b_name = "${module.label.id}"
+  b_name_hyphen = "${substr(join("-", split("_", lower(local.b_name))), 0, 20)}"
+  cache = {
+    type     = "S3"
+    location = "${aws_s3_bucket.cache_bucket.bucket}"
+  }
+}
+
 resource "aws_iam_role" "default" {
   name               = "${module.label.id}"
   assume_role_policy = "${data.aws_iam_policy_document.role.json}"
@@ -63,6 +97,21 @@ data "aws_iam_policy_document" "permissions" {
       "*",
     ]
   }
+
+  statement {
+    sid = ""
+
+    actions = [
+      "s3:*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+        "${aws_s3_bucket.cache_bucket.arn}",
+        "${aws_s3_bucket.cache_bucket.arn}/*",
+    ]
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
@@ -77,6 +126,8 @@ resource "aws_codebuild_project" "default" {
   artifacts {
     type = "CODEPIPELINE"
   }
+
+  cache = "${local.cache}"
 
   environment {
     compute_type    = "${var.build_compute_type}"
