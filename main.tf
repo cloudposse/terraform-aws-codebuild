@@ -41,10 +41,12 @@ resource "aws_s3_bucket" "cache_bucket" {
 locals {
   b_name = "${module.label.id}"
   b_name_hyphen = "${substr(join("-", split("_", lower(local.b_name))), 0, 20)}"
-  cache = {
+  cache_def = {
     type     = "S3"
     location = "${aws_s3_bucket.cache_bucket.bucket}"
   }
+  cache_empty = {}
+  cache = ${var.cache == "true" ? local.cache_def : local.cache_empty }
 }
 
 resource "aws_iam_role" "default" {
