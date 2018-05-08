@@ -10,13 +10,24 @@ variable "name" {
   default = "codebuild"
 }
 
-variable "cache" {
-  default = "true"
+variable "environment_variables" {
+  default     = []
+  description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build."
+}
+
+variable "cache_enabled" {
+  default     = "true"
   description = "If cache is true, create an S3 bucket for storing codebuild cache inside"
 }
-variable "cache_timeout" {
-  default = "7"
+
+variable "cache_expiration_days" {
+  default     = "7"
   description = "How many days should the build cache be kept."
+}
+
+variable "cache_bucket_suffix_enabled" {
+  default     = "true"
+  description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
 }
 
 variable "build_image" {

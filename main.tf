@@ -14,36 +14,91 @@ module "label" {
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
-  bucket_prefix = "${local.b_name_hyphen}"
-  acl    = "private"
+  count         = "${var.cache_enabled == "true" ? 1 : 0}"
+  bucket        = "${local.cache_bucket_name_normalised}"
+  acl           = "private"
   force_destroy = true
-  tags = "${module.label.tags}"
+  tags          = "${module.label.tags}"
 
   lifecycle_rule {
     id      = "codebuildcache"
     enabled = true
 
-    prefix  = "/"
-    tags = "${module.label.tags}"
+    prefix = "/"
+    tags   = "${module.label.tags}"
 
     expiration {
-      days = "${var.cache_timeout}"
+      days = "${var.cache_expiration_days}"
     }
   }
+}
 
+provider "random" {
+  version = "~> 1.0"
+}
+
+provider "null" {
+  version = "~> 1.0"
+}
+
+resource "random_string" "bucket_prefix" {
+  length  = 12
+  number  = false
+  upper   = false
+  special = false
+  lower   = true
 }
 
 locals {
-  b_name = "${module.label.id}"
-  b_name_hyphen = "${substr(join("-", split("_", lower(local.b_name))), 0, 20)}"
+  cache_bucket_name = "${module.label.id}${var.cache_bucket_suffix_enabled == "true" ? "-${random_string.bucket_prefix.result}" : "" }"
+
+  ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
+  ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
+  cache_bucket_name_normalised = "${substr(join("-", split("_", lower(local.cache_bucket_name))), 0, min(length(local.cache_bucket_name),63))}"
+
+  ## This is the magic where a map of a list of maps is generated
+  ## and used to conditionally add the cache bucket option to the 
+  ## aws_codebuild_project
   cache_def = {
     "true" = [{
-              type     = "S3"
-              location = "${aws_s3_bucket.cache_bucket.bucket}"
-              }]
-    "false" = [{}]
+      type     = "S3"
+      location = "${var.cache_enabled == "true" ? aws_s3_bucket.cache_bucket.0.bucket : "none" }"
+    }]
+
+    "false" = []
   }
-  cache = "${local.cache_def[var.cache]}"
+
+  # Final Map Selected from above
+  cache = "${local.cache_def[var.cache_enabled]}"
+
+  # All environment variables must have values or else an error occurs
+  # generating this list for the outputs
+  environment_variables = [{
+    "name"  = "AWS_REGION"
+    "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
+  },
+    {
+      "name"  = "AWS_ACCOUNT_ID"
+      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
+    },
+    {
+      "name"  = "IMAGE_REPO_NAME"
+      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
+    },
+    {
+      "name"  = "IMAGE_TAG"
+      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
+    },
+    {
+      "name"  = "STAGE"
+      "value" = "${signum(length(var.stage)) == 1 ? var.stage : "UNSET"}"
+    },
+    {
+      "name"  = "GITHUB_TOKEN"
+      "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
+    },
+    "${var.environment_variables}",
+  ]
 }
 
 resource "aws_iam_role" "default" {
@@ -74,6 +129,13 @@ resource "aws_iam_policy" "default" {
   policy = "${data.aws_iam_policy_document.permissions.json}"
 }
 
+resource "aws_iam_policy" "default_cache_bucket" {
+  count  = "${var.cache_enabled == "true" ? 1 : 0}"
+  name   = "${module.label.id}-cache-bucket"
+  path   = "/service-role/"
+  policy = "${data.aws_iam_policy_document.permissions_cache_bucket.json}"
+}
+
 data "aws_iam_policy_document" "permissions" {
   statement {
     sid = ""
@@ -96,7 +158,9 @@ data "aws_iam_policy_document" "permissions" {
       "*",
     ]
   }
+}
 
+data "aws_iam_policy_document" "permissions_cache_bucket" {
   statement {
     sid = ""
 
@@ -107,14 +171,20 @@ data "aws_iam_policy_document" "permissions" {
     effect = "Allow"
 
     resources = [
-        "${aws_s3_bucket.cache_bucket.arn}",
-        "${aws_s3_bucket.cache_bucket.arn}/*",
+      "${aws_s3_bucket.cache_bucket.arn}",
+      "${aws_s3_bucket.cache_bucket.arn}/*",
     ]
   }
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
   policy_arn = "${aws_iam_policy.default.arn}"
+  role       = "${aws_iam_role.default.id}"
+}
+
+resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
+  count      = "${var.cache_enabled == "true" ? 1 : 0}"
+  policy_arn = "${element(aws_iam_policy.default_cache_bucket.*.arn, count.index)}"
   role       = "${aws_iam_role.default.id}"
 }
 
@@ -126,6 +196,7 @@ resource "aws_codebuild_project" "default" {
     type = "CODEPIPELINE"
   }
 
+  # The cache as a list with a map object inside.
   cache = ["${local.cache}"]
 
   environment {
@@ -134,35 +205,34 @@ resource "aws_codebuild_project" "default" {
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
 
-    environment_variable {
+    # The environment variables are a list with a map object inside.
+    #environment_variable = ["${local.environment_variables}"]
+    environment_variable = [{
       "name"  = "AWS_REGION"
       "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
-    }
-
-    environment_variable {
-      "name"  = "AWS_ACCOUNT_ID"
-      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
-    }
-
-    environment_variable {
-      "name"  = "IMAGE_REPO_NAME"
-      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
-    }
-
-    environment_variable {
-      "name"  = "IMAGE_TAG"
-      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
-    }
-
-    environment_variable {
-      "name"  = "STAGE"
-      "value" = "${var.stage}"
-    }
-
-    environment_variable {
-      "name"  = "GITHUB_TOKEN"
-      "value" = "${var.github_token}"
-    }
+    },
+      {
+        "name"  = "AWS_ACCOUNT_ID"
+        "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
+      },
+      {
+        "name"  = "IMAGE_REPO_NAME"
+        "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
+      },
+      {
+        "name"  = "IMAGE_TAG"
+        "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
+      },
+      {
+        "name"  = "STAGE"
+        "value" = "${signum(length(var.stage)) == 1 ? var.stage : "UNSET"}"
+      },
+      {
+        "name"  = "GITHUB_TOKEN"
+        "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
+      },
+      "${var.environment_variables}",
+    ]
   }
 
   source {
