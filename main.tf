@@ -71,34 +71,6 @@ locals {
   # Final Map Selected from above
   cache = "${local.cache_def[var.cache_enabled]}"
 
-  # All environment variables must have values or else an error occurs
-  # generating this list for the outputs
-  environment_variables = [{
-    "name"  = "AWS_REGION"
-    "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
-  },
-    {
-      "name"  = "AWS_ACCOUNT_ID"
-      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
-    },
-    {
-      "name"  = "IMAGE_REPO_NAME"
-      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
-    },
-    {
-      "name"  = "IMAGE_TAG"
-      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
-    },
-    {
-      "name"  = "STAGE"
-      "value" = "${signum(length(var.stage)) == 1 ? var.stage : "UNSET"}"
-    },
-    {
-      "name"  = "GITHUB_TOKEN"
-      "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
-    },
-    "${var.environment_variables}",
-  ]
 }
 
 resource "aws_iam_role" "default" {
@@ -204,9 +176,6 @@ resource "aws_codebuild_project" "default" {
     image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
-
-    # The environment variables are a list with a map object inside.
-    #environment_variable = ["${local.environment_variables}"]
     environment_variable = [{
       "name"  = "AWS_REGION"
       "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
@@ -231,7 +200,7 @@ resource "aws_codebuild_project" "default" {
         "name"  = "GITHUB_TOKEN"
         "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
       },
-      "${var.environment_variables}",
+      "${var.environment_variables}"
     ]
   }
 

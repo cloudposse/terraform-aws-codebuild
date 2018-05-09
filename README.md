@@ -14,7 +14,7 @@ module "build" {
     name                = "ci"
     stage               = "staging"
     
-    # http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html
+    # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
     build_image         = "aws/codebuild/docker:1.12.1"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
     
@@ -54,7 +54,7 @@ module "build" {
 | namespace             | global                       | Namespace                                                                                                                                            |
 | stage                 | default                      | Stage                                                                                                                                                |
 | name                  | codebuild                    | Name                                                                                                                                                 |
-| build_image           | aws/codebuild/docker:1.12.1  | Docker image for build environment, _e.g._ `aws/codebuild/docker:1.12.1` or `aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0`                    |
+| build_image           | aws/codebuild/docker:1.12.1  | Docker image for build environment, _e.g._ `aws/codebuild/docker:1.12.1` or `aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0` (use `aws codebuild list-curated-environment-images` to get full list)                   |
 | build_compute_type    | BUILD_GENERAL1_SMALL         | `CodeBuild` instance size.  Possible values are: ```BUILD_GENERAL1_SMALL``` ```BUILD_GENERAL1_MEDIUM``` ```BUILD_GENERAL1_LARGE```                   |
 | buildspec             | ""                           | (Optional) `buildspec` declaration to use for building the project                                                                                   |
 | privileged_mode       | ""                           | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the `CodeBuild` instance. Used when building Docker images |
@@ -77,7 +77,7 @@ module "build" {
 | project_id            | CodeBuild project ARN     |
 | role_arn              | IAM Role ARN              |
 | cache_bucket_name     | Name of s3 caching bucket |
-| environment_variables | output of all environment variables |
+
 
 
 ## License
