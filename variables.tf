@@ -12,10 +12,12 @@ variable "name" {
 
 variable "environment_variables" {
   type = "list"
-  default     = [{
-    "name" = "NO_ADDITIONAL_BUILD_VARS"
+
+  default = [{
+    "name"  = "NO_ADDITIONAL_BUILD_VARS"
     "value" = "TRUE"
-    }]
+  }]
+
   description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build."
 }
 

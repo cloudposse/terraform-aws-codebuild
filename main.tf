@@ -70,7 +70,6 @@ locals {
 
   # Final Map Selected from above
   cache = "${local.cache_def[var.cache_enabled]}"
-
 }
 
 resource "aws_iam_role" "default" {
@@ -176,6 +175,7 @@ resource "aws_codebuild_project" "default" {
     image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
+
     environment_variable = [{
       "name"  = "AWS_REGION"
       "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
@@ -200,7 +200,7 @@ resource "aws_codebuild_project" "default" {
         "name"  = "GITHUB_TOKEN"
         "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
       },
-      "${var.environment_variables}"
+      "${var.environment_variables}",
     ]
   }
 
