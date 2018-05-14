@@ -33,14 +33,6 @@ resource "aws_s3_bucket" "cache_bucket" {
   }
 }
 
-provider "random" {
-  version = "~> 1.0"
-}
-
-provider "null" {
-  version = "~> 1.0"
-}
-
 resource "random_string" "bucket_prefix" {
   length  = 12
   number  = false

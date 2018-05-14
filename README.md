@@ -46,6 +46,18 @@ module "build" {
 }
 ```
 
+## To hide warnings about unset versions in providers
+Add this in your .tf files
+
+```
+provider "random" {
+  version = "~> 1.0"
+}
+
+provider "null" {
+  version = "~> 1.0"
+}
+```
 
 ## Input
 
