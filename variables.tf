@@ -23,7 +23,7 @@ variable "environment_variables" {
 
 variable "cache_enabled" {
   default     = "true"
-  description = "If cache is true, create an S3 bucket for storing codebuild cache inside"
+  description = "If cache_enabled is true, create an S3 bucket for storing codebuild cache inside"
 }
 
 variable "cache_expiration_days" {
