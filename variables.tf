@@ -10,32 +10,6 @@ variable "name" {
   default = "codebuild"
 }
 
-variable "environment_variables" {
-  type = "list"
-
-  default = [{
-    "name"  = "NO_ADDITIONAL_BUILD_VARS"
-    "value" = "TRUE"
-  }]
-
-  description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build."
-}
-
-variable "cache_enabled" {
-  default     = "true"
-  description = "If cache_enabled is true, create an S3 bucket for storing codebuild cache inside"
-}
-
-variable "cache_expiration_days" {
-  default     = "7"
-  description = "How many days should the build cache be kept."
-}
-
-variable "cache_bucket_suffix_enabled" {
-  default     = "true"
-  description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
-}
-
 variable "build_image" {
   default     = "aws/codebuild/docker:1.12.1"
   description = "Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html"
@@ -97,4 +71,34 @@ variable "image_tag" {
   type        = "string"
   default     = "latest"
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
+}
+
+variable "codebuild_var1" {
+  type        = "string"
+  default     = "var1"
+}
+
+variable "codebuild_var1_val" {
+  type        = "string"
+  default     = "value1"
+}
+
+variable "codebuild_var2" {
+  type        = "string"
+  default     = "var2"
+}
+
+variable "codebuild_var2_val" {
+  type        = "string"
+  default     = "value2"
+}
+
+variable "codebuild_var3" {
+  type        = "string"
+  default     = "var3"
+}
+
+variable "codebuild_var3_val" {
+  type        = "string"
+  default     = "value3"
 }
