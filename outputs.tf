@@ -11,5 +11,5 @@ output "role_arn" {
 }
 
 output "cache_bucket_name" {
-  value = "${var.enabled == "true" && var.cache_enabled == "true" ? aws_s3_bucket.cache_bucket.0.bucket : "UNSET" }"
+  value = "${var.enabled == "true" && var.cache_enabled == "true" ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "UNSET" }"
 }
