@@ -54,7 +54,7 @@ locals {
   cache_def = {
     "true" = [{
       type     = "S3"
-      location = "${var.enabled == "true" && var.cache_enabled == "true" ? aws_s3_bucket.cache_bucket.0.bucket : "none" }"
+      location = "${var.enabled == "true" && var.cache_enabled == "true" ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none" }"
     }]
 
     "false" = []
