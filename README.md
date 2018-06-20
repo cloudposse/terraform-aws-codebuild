@@ -22,7 +22,7 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 
 Include this module in your existing terraform code:
 
-```
+```hcl
 module "build" {
     source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
     namespace           = "general"
@@ -64,7 +64,7 @@ module "build" {
 ### To hide warnings about unset versions in providers
 
 Add this to your .tf files
-```
+```hcl
 provider "random" {
   version = "~> 1.0"
 }
