@@ -41,7 +41,7 @@ description: |-
 usage: |-
   Include this module in your existing terraform code:
 
-  ```
+  ```hcl
   module "build" {
       source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
       namespace           = "general"
@@ -83,7 +83,7 @@ usage: |-
   ### To hide warnings about unset versions in providers
 
   Add this to your .tf files
-  ```
+  ```hcl
   provider "random" {
     version = "~> 1.0"
   }
