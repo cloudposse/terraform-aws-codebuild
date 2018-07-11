@@ -1,16 +1,19 @@
 variable "namespace" {
-  type    = "string"
-  default = "global"
+  type        = "string"
+  default     = "global"
+  description = "Namespace, which could be your organization name, e.g. 'cp' or 'cloudposse'"
 }
 
 variable "stage" {
-  type    = "string"
-  default = "default"
+  type        = "string"
+  default     = "default"
+  description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
 }
 
 variable "name" {
-  type    = "string"
-  default = "codebuild"
+  type        = "string"
+  default     = "codebuild"
+  description = "Solution name, e.g. 'app' or 'jenkins'"
 }
 
 variable "environment_variables" {
@@ -27,7 +30,7 @@ variable "environment_variables" {
 variable "enabled" {
   type        = "string"
   default     = "true"
-  description = "A boolean to enable/disable resource creation."
+  description = "A boolean to enable/disable resource creation"
 }
 
 variable "cache_enabled" {
@@ -39,7 +42,7 @@ variable "cache_enabled" {
 variable "cache_expiration_days" {
   type        = "string"
   default     = "7"
-  description = "How many days should the build cache be kept."
+  description = "How many days should the build cache be kept"
 }
 
 variable "cache_bucket_suffix_enabled" {
@@ -55,8 +58,9 @@ variable "build_image" {
 }
 
 variable "build_compute_type" {
-  type    = "string"
-  default = "BUILD_GENERAL1_SMALL"
+  type        = "string"
+  default     = "BUILD_GENERAL1_SMALL"
+  description = "Instance type of the build instance"
 }
 
 variable "buildspec" {
@@ -66,18 +70,21 @@ variable "buildspec" {
 }
 
 variable "delimiter" {
-  type    = "string"
-  default = "-"
+  type        = "string"
+  default     = "-"
+  description = "Delimiter to be used between `name`, `namespace`, `stage`, etc."
 }
 
 variable "attributes" {
-  type    = "list"
-  default = []
+  type        = "list"
+  default     = []
+  description = "Additional attributes (e.g. `policy` or `role`)"
 }
 
 variable "tags" {
-  type    = "map"
-  default = {}
+  type        = "map"
+  default     = {}
+  description = "Additional tags (e.g. `map('BusinessUnit', 'XYZ')`"
 }
 
 variable "privileged_mode" {
