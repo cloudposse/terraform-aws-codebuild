@@ -49,7 +49,7 @@ locals {
   cache_bucket_name_normalised = "${substr(join("-", split("_", lower(local.cache_bucket_name))), 0, min(length(local.cache_bucket_name),63))}"
 
   ## This is the magic where a map of a list of maps is generated
-  ## and used to conditionally add the cache bucket option to the 
+  ## and used to conditionally add the cache bucket option to the
   ## aws_codebuild_project
   cache_def = {
     "true" = [{
@@ -205,7 +205,8 @@ resource "aws_codebuild_project" "default" {
 
   source {
     buildspec = "${var.buildspec}"
-    type      = "CODEPIPELINE"
+    type      = "${var.source_type}"
+    location  = "${var.source_location}"
   }
 
   tags = "${module.label.tags}"

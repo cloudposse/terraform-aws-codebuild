@@ -122,3 +122,15 @@ variable "image_tag" {
   default     = "latest"
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
 }
+
+variable "source_type" {
+  type        = "string"
+  default     = "CODEPIPELINE"
+  description = "(Required) The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3."
+}
+
+variable "source_location" {
+  type        = "string"
+  default     = ""
+  description = "(Optional) The location of the source code from git or s3."
+}

@@ -23,6 +23,8 @@
 | privileged_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | string | `false` | no |
 | stage | Stage, e.g. 'prod', 'staging', 'dev', or 'test' | string | `default` | no |
 | tags | Additional tags (e.g. `map('BusinessUnit', 'XYZ')` | map | `<map>` | no |
+| source_type | The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3. | string | `CODEPIPELINE` | no |
+| source_location | The location of the source code from git or s3. | string | `` | no |
 
 ## Outputs
 
