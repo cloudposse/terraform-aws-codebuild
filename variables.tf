@@ -126,11 +126,11 @@ variable "image_tag" {
 variable "source_type" {
   type        = "string"
   default     = "CODEPIPELINE"
-  description = "(Required) The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3."
+  description = "The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3."
 }
 
 variable "source_location" {
   type        = "string"
   default     = ""
-  description = "(Optional) The location of the source code from git or s3."
+  description = "The location of the source code from git or s3."
 }
