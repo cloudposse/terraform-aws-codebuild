@@ -1,10 +1,12 @@
 data "aws_caller_identity" "default" {}
 
-data "aws_region" "default" {}
+data "aws_region" "default" {
+  current = true
+}
 
 # Define composite variables for resources
 module "label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.1.0"
+  source     = "git::https://github.com/huksley/terraform-generic-label.git?ref=master"
   namespace  = "${var.namespace}"
   name       = "${var.name}"
   stage      = "${var.stage}"
@@ -166,41 +168,56 @@ resource "aws_codebuild_project" "default" {
     type = "CODEPIPELINE"
   }
 
-  # The cache as a list with a map object inside.
-  cache = ["${local.cache}"]
-
   environment {
     compute_type    = "${var.build_compute_type}"
     image           = "${var.build_image}"
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
 
-    environment_variable = [{
+    environment_variable {
       "name"  = "AWS_REGION"
       "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
-    },
-      {
-        "name"  = "AWS_ACCOUNT_ID"
-        "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
-      },
-      {
-        "name"  = "IMAGE_REPO_NAME"
-        "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
-      },
-      {
-        "name"  = "IMAGE_TAG"
-        "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
-      },
-      {
-        "name"  = "STAGE"
-        "value" = "${signum(length(var.stage)) == 1 ? var.stage : "UNSET"}"
-      },
-      {
-        "name"  = "GITHUB_TOKEN"
-        "value" = "${signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"}"
-      },
-      "${var.environment_variables}",
-    ]
+    }
+
+    environment_variable {
+      "name"  = "AWS_ACCOUNT_ID"
+      "value" = "${signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_REPO_NAME"
+      "value" = "${signum(length(var.image_repo_name)) == 1 ? var.image_repo_name : "UNSET"}"
+    }
+
+    environment_variable {
+      "name"  = "IMAGE_TAG"
+      "value" = "${signum(length(var.image_tag)) == 1 ? var.image_tag : "latest"}"
+    }
+
+    environment_variable {
+      "name"  = "STAGE"
+      "value" = "${var.stage}"
+    }
+
+    environment_variable {
+      "name"  = "GITHUB_TOKEN"
+      "value" = "${var.github_token}"
+    }
+
+    environment_variable {
+      "name"  = "${var.codebuild_var1}"
+      "value" = "${var.codebuild_var1_val}"
+    }
+
+    environment_variable {
+      "name"  = "${var.codebuild_var2}"
+      "value" = "${var.codebuild_var2_val}"
+    }
+
+    environment_variable {
+      "name"  = "${var.codebuild_var3}"
+      "value" = "${var.codebuild_var3_val}"
+    }
   }
 
   source {

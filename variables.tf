@@ -16,17 +16,6 @@ variable "name" {
   description = "Solution name, e.g. 'app' or 'jenkins'"
 }
 
-variable "environment_variables" {
-  type = "list"
-
-  default = [{
-    "name"  = "NO_ADDITIONAL_BUILD_VARS"
-    "value" = "TRUE"
-  }]
-
-  description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build."
-}
-
 variable "enabled" {
   type        = "string"
   default     = "true"
@@ -121,6 +110,36 @@ variable "image_tag" {
   type        = "string"
   default     = "latest"
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
+}
+
+variable "codebuild_var1" {
+  type        = "string"
+  default     = "var1"
+}
+
+variable "codebuild_var1_val" {
+  type        = "string"
+  default     = "value1"
+}
+
+variable "codebuild_var2" {
+  type        = "string"
+  default     = "var2"
+}
+
+variable "codebuild_var2_val" {
+  type        = "string"
+  default     = "value2"
+}
+
+variable "codebuild_var3" {
+  type        = "string"
+  default     = "var3"
+}
+
+variable "codebuild_var3_val" {
+  type        = "string"
+  default     = "value3"
 }
 
 variable "source_type" {
