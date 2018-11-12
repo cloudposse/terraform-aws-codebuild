@@ -163,7 +163,7 @@ resource "aws_codebuild_project" "default" {
   service_role = "${aws_iam_role.default.arn}"
 
   artifacts {
-    type = "CODEPIPELINE"
+    type = "${var.artifact_type}"
   }
 
   # The cache as a list with a map object inside.
