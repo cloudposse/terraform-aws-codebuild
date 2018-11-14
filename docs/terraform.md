@@ -3,6 +3,7 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| artifact_type | The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3. | string | `CODEPIPELINE` | no |
 | attributes | Additional attributes (e.g. `policy` or `role`) | list | `<list>` | no |
 | aws_account_id | (Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
 | aws_region | (Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
