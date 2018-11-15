@@ -134,3 +134,9 @@ variable "source_location" {
   default     = ""
   description = "The location of the source code from git or s3."
 }
+
+variable "artifact_type" {
+  type        = "string"
+  default     = "CODEPIPELINE"
+  description = "The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3."
+}
