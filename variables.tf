@@ -1,21 +1,3 @@
-variable "namespace" {
-  type        = "string"
-  default     = "global"
-  description = "Namespace, which could be your organization name, e.g. 'cp' or 'cloudposse'"
-}
-
-variable "stage" {
-  type        = "string"
-  default     = "default"
-  description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-}
-
-variable "name" {
-  type        = "string"
-  default     = "codebuild"
-  description = "Solution name, e.g. 'app' or 'jenkins'"
-}
-
 variable "environment_variables" {
   type = "list"
 
@@ -29,13 +11,13 @@ variable "environment_variables" {
 
 variable "enabled" {
   type        = "string"
-  default     = "true"
+  default     = true
   description = "A boolean to enable/disable resource creation"
 }
 
 variable "cache_enabled" {
   type        = "string"
-  default     = "true"
+  default     = true
   description = "If cache_enabled is true, create an S3 bucket for storing codebuild cache inside"
 }
 
@@ -47,7 +29,7 @@ variable "cache_expiration_days" {
 
 variable "cache_bucket_suffix_enabled" {
   type        = "string"
-  default     = "true"
+  default     = true
   description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
 }
 
@@ -69,22 +51,10 @@ variable "buildspec" {
   description = "Optional buildspec declaration to use for building the project"
 }
 
-variable "delimiter" {
+variable "environment_variable_count" {
   type        = "string"
-  default     = "-"
-  description = "Delimiter to be used between `name`, `namespace`, `stage`, etc."
-}
-
-variable "attributes" {
-  type        = "list"
-  default     = []
-  description = "Additional attributes (e.g. `policy` or `role`)"
-}
-
-variable "tags" {
-  type        = "map"
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit', 'XYZ')`"
+  default     = "0"
+  description = "Number of environment variables in the var.environment_variables list"
 }
 
 variable "privileged_mode" {
@@ -121,6 +91,30 @@ variable "image_tag" {
   type        = "string"
   default     = "latest"
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
+}
+
+variable "default_role_actions" {
+  type        = "list"
+  description = "The AWS IAM actions allowed by the codebuild role"
+
+  default = [
+    "ecr:BatchCheckLayerAvailability",
+    "ecr:CompleteLayerUpload",
+    "ecr:GetAuthorizationToken",
+    "ecr:InitiateLayerUpload",
+    "ecr:PutImage",
+    "ecr:UploadLayerPart",
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents",
+    "ssm:GetParameters",
+  ]
+}
+
+variable "default_role_resources" {
+  type        = "list"
+  description = "The AWS IAM resources the role can do the actions against"
+  default     = ["*"]
 }
 
 variable "source_type" {
