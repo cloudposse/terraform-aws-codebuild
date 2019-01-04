@@ -54,6 +54,7 @@ module "build" {
     # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
     build_image         = "aws/codebuild/docker:1.12.1"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
+    build_timeout       = "60"
 
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
     # For more info:
@@ -122,6 +123,7 @@ Available targets:
 | aws_region | (Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
 | build_compute_type | Instance type of the build instance | string | `BUILD_GENERAL1_SMALL` | no |
 | build_image | Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/docker:1.12.1` | no |
+| build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | string | `60` | no |
 | buildspec | Optional buildspec declaration to use for building the project | string | `` | no |
 | cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value | string | `true` | no |
 | cache_enabled | If cache_enabled is true, create an S3 bucket for storing codebuild cache inside | string | `true` | no |
@@ -229,7 +231,7 @@ In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
 
 ## Copyright
 
-Copyright © 2017-2018 [Cloud Posse, LLC](https://cpco.io/copyright)
+Copyright © 2017-2019 [Cloud Posse, LLC](https://cpco.io/copyright)
 
 
 

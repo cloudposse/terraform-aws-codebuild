@@ -66,6 +66,7 @@ usage: |-
       # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
       build_image         = "aws/codebuild/docker:1.12.1"
       build_compute_type  = "BUILD_GENERAL1_SMALL"
+      build_timeout       = "60"
 
       # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
       # For more info:
