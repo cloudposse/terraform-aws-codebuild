@@ -63,6 +63,12 @@ variable "build_compute_type" {
   description = "Instance type of the build instance"
 }
 
+variable "build_timeout" {
+  type        = "string"
+  default     = "60"
+  description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed."
+}
+
 variable "buildspec" {
   type        = "string"
   default     = ""
