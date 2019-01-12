@@ -120,7 +120,7 @@ Available targets:
 | attributes | Additional attributes (e.g. `policy` or `role`) | list | `<list>` | no |
 | aws_account_id | (Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
 | aws_region | (Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
-| badge_enabled | Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled. | string | `true` | no |
+| badge_enabled | Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled. | string | `false` | no |
 | build_compute_type | Instance type of the build instance | string | `BUILD_GENERAL1_SMALL` | no |
 | build_image | Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/docker:1.12.1` | no |
 | build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | string | `60` | no |
