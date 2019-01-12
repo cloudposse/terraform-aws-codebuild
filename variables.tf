@@ -51,6 +51,12 @@ variable "cache_bucket_suffix_enabled" {
   description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
 }
 
+variable "badge_enabled" {
+  type        = "string"
+  default     = "true"
+  description = "Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled."
+}
+
 variable "build_image" {
   type        = "string"
   default     = "aws/codebuild/docker:1.12.1"
