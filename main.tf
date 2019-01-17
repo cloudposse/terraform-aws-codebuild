@@ -116,6 +116,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "ssm:GetParameters",
+      "ecs:RunTask"
     ]
 
     effect = "Allow"
