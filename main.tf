@@ -113,6 +113,7 @@ data "aws_iam_policy_document" "permissions" {
       "ecr:PutImage",
       "ecr:UploadLayerPart",
       "ecs:RunTask",
+      "iam:PassRole",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
