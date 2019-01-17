@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "ssm:GetParameters"
+      "ssm:GetParameters",
     ]
 
     effect = "Allow"
