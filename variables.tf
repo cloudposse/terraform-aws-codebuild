@@ -152,3 +152,9 @@ variable "artifact_type" {
   default     = "CODEPIPELINE"
   description = "The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3."
 }
+
+variable "report_build_status" {
+  type        = "string"
+  default     = "false"
+  description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB."
+}
