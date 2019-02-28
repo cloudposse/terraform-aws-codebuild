@@ -208,9 +208,10 @@ resource "aws_codebuild_project" "default" {
   }
 
   source {
-    buildspec = "${var.buildspec}"
-    type      = "${var.source_type}"
-    location  = "${var.source_location}"
+    buildspec           = "${var.buildspec}"
+    type                = "${var.source_type}"
+    location            = "${var.source_location}"
+    report_build_status = "${var.report_build_status}"
   }
 
   tags = "${module.label.tags}"
