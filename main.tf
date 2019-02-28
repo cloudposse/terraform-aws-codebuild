@@ -165,7 +165,6 @@ resource "aws_codebuild_project" "default" {
   service_role        = "${aws_iam_role.default.arn}"
   badge_enabled       = "${var.badge_enabled}"
   build_timeout       = "${var.build_timeout}"
-  report_build_status = "${var.report_build_status}"
 
   artifacts {
     type = "${var.artifact_type}"
@@ -209,9 +208,10 @@ resource "aws_codebuild_project" "default" {
   }
 
   source {
-    buildspec = "${var.buildspec}"
-    type      = "${var.source_type}"
-    location  = "${var.source_location}"
+    buildspec           = "${var.buildspec}"
+    type                = "${var.source_type}"
+    location            = "${var.source_location}"
+    report_build_status = "${var.report_build_status}"
   }
 
   tags = "${module.label.tags}"
