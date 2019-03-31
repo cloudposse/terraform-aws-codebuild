@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = "${var.enabled == "true" ? 1 : 0}"
+  count = "${var.enabled == "true" && var.cache_enabled == "true" ? 1 : 0}"
 
   statement {
     sid = ""
