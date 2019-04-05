@@ -38,4 +38,5 @@
 | project_id | Project ID |
 | project_name | Project name |
 | role_arn | IAM Role ARN |
+| role_id | IAM Role ID |
 
