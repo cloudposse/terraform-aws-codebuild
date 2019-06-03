@@ -50,18 +50,24 @@ Instead pin to the release tag (e.g. `?ref=tags/x.y.z`) of one of our [latest re
 Include this module in your existing terraform code:
 
 ```hcl
-module "build" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
+module "label" {
+    source      = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.11.1"
     namespace           = "general"
     name                = "ci"
     stage               = "staging"
+}
+
+module "build" {
+    source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
+    context             = "${module.label.context}"
 
     # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
     build_image         = "aws/codebuild/docker:1.12.1"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
     build_timeout       = "60"
 
-    # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
+    # These attributes are optional, used as ENV variables when building 
+    # Docker images and pushing them to ECR.
     # For more info:
     # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
     # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
@@ -74,17 +80,21 @@ module "build" {
 
     # Optional extra environment variables
     environment_variables = [{
-        name  = "JENKINS_URL"
-        value = "https://jenkins.example.com"
+        name    = "JENKINS_URL"
+        value   = "https://jenkins.example.com"
       },
       {
-        name  = "COMPANY_NAME"
-        value = "Amazon"
+        name    = "COMPANY_NAME"
+        value   = "Amazon"
       },
       {
-        name = "TIME_ZONE"
-        value = "Pacific/Auckland"
-
+        name    = "TIME_ZONE"
+        value   = "Pacific/Auckland"
+      },
+      {
+        "name"  = "DB_PASSWORD"
+        "value" = "/ssmparameter/path/to/db/password"
+        "type"  = "PARAMETER_STORE"
       }]
 }
 ```
@@ -300,7 +310,7 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
 ### Contributors
 
-|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Jamie Nelson][Jamie-BitfFlight_avatar]][Jamie-BitfFlight_homepage]<br/>[Jamie Nelson][Jamie-BitfFlight_homepage] | [![Sarkis Varozian][sarkis_avatar]][sarkis_homepage]<br/>[Sarkis Varozian][sarkis_homepage] |
+|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Jamie Nelson][Jamie-BitFlight_avatar]][Jamie-BitFlight_homepage]<br/>[Jamie Nelson][Jamie-BitFlight_homepage] | [![Sarkis Varozian][sarkis_avatar]][sarkis_homepage]<br/>[Sarkis Varozian][sarkis_homepage] |
 |---|---|---|---|---|
 
   [osterman_homepage]: https://github.com/osterman
@@ -309,8 +319,8 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
   [goruha_avatar]: https://github.com/goruha.png?size=150
   [aknysh_homepage]: https://github.com/aknysh
   [aknysh_avatar]: https://github.com/aknysh.png?size=150
-  [Jamie-BitfFlight_homepage]: https://github.com/Jamie-BitfFlight
-  [Jamie-BitfFlight_avatar]: https://github.com/Jamie-BitfFlight.png?size=150
+  [Jamie-BitFlight_homepage]: https://github.com/Jamie-BitFlight
+  [Jamie-BitFlight_avatar]: https://github.com/Jamie-BitFlight.png?size=150
   [sarkis_homepage]: https://github.com/sarkis
   [sarkis_avatar]: https://github.com/sarkis.png?size=150
 
