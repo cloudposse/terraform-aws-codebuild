@@ -158,9 +158,15 @@ resource "null_resource" "env" {
   }
 }
 
+locals {
+  ## Provide a default description based on the label module.
+  description = "${var.description == "" ? title(replace(module.label.id, module.label.delimiter, " ")) : var.description}"
+}
+
 resource "aws_codebuild_project" "default" {
   count         = "${var.enabled == "true" ? 1 : 0}"
   name          = "${module.label.id}"
+  description   = "${local.description}"
   service_role  = "${aws_iam_role.default.arn}"
   badge_enabled = "${var.badge_enabled}"
   build_timeout = "${var.build_timeout}"
@@ -213,5 +219,6 @@ resource "aws_codebuild_project" "default" {
     report_build_status = "${var.report_build_status}"
   }
 
-  tags = "${module.label.tags}"
+  tags       = "${module.label.tags}"
+  depends_on = ["null_resource.env"]
 }

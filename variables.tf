@@ -6,7 +6,13 @@ variable "environment_variables" {
     "value" = "TRUE"
   }]
 
-  description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build."
+  description = "A list of maps, that contain both the key 'name' and the key 'value', and optionally 'type' (with the value 'PARAMETER_STORE') to be used as additional environment variables for the build."
+}
+
+variable "description" {
+  type        = "string"
+  default     = ""
+  description = "The AWS Codebuild project description. Generated based on the label module if left empty."
 }
 
 variable "enabled" {
@@ -103,24 +109,6 @@ variable "image_tag" {
   type        = "string"
   default     = "latest"
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
-variable "default_role_actions" {
-  type        = "list"
-  description = "The AWS IAM actions allowed by the codebuild role"
-
-  default = [
-    "ecr:BatchCheckLayerAvailability",
-    "ecr:CompleteLayerUpload",
-    "ecr:GetAuthorizationToken",
-    "ecr:InitiateLayerUpload",
-    "ecr:PutImage",
-    "ecr:UploadLayerPart",
-    "logs:CreateLogGroup",
-    "logs:CreateLogStream",
-    "logs:PutLogEvents",
-    "ssm:GetParameters",
-  ]
 }
 
 variable "default_role_resources" {
