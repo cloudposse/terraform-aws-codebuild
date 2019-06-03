@@ -1,4 +1,3 @@
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -7,8 +6,10 @@
 | attributes | Additional attributes (e.g. `policy` or `role`) | list | `<list>` | no |
 | aws_account_id | (Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
 | aws_region | (Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
+| badge_enabled | Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled. | string | `false` | no |
 | build_compute_type | Instance type of the build instance | string | `BUILD_GENERAL1_SMALL` | no |
 | build_image | Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/docker:1.12.1` | no |
+| build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | string | `60` | no |
 | buildspec | Optional buildspec declaration to use for building the project | string | `` | no |
 | cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value | string | `true` | no |
 | cache_enabled | If cache_enabled is true, create an S3 bucket for storing codebuild cache inside | string | `true` | no |
@@ -22,6 +23,7 @@
 | name | Solution name, e.g. 'app' or 'jenkins' | string | `codebuild` | no |
 | namespace | Namespace, which could be your organization name, e.g. 'cp' or 'cloudposse' | string | `global` | no |
 | privileged_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | string | `false` | no |
+| report_build_status | Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB. | string | `false` | no |
 | source_location | The location of the source code from git or s3. | string | `` | no |
 | source_type | The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3. | string | `CODEPIPELINE` | no |
 | stage | Stage, e.g. 'prod', 'staging', 'dev', or 'test' | string | `default` | no |
@@ -31,8 +33,11 @@
 
 | Name | Description |
 |------|-------------|
+| badge_url | The URL of the build badge when badge_enabled is enabled |
+| cache_bucket_arn | Cache S3 bucket ARN |
 | cache_bucket_name | Cache S3 bucket name |
 | project_id | Project ID |
 | project_name | Project name |
 | role_arn | IAM Role ARN |
+| role_id | IAM Role ID |
 

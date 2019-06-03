@@ -7,6 +7,21 @@
 # Name of this project
 name: terraform-aws-codebuild
 
+# Tags of this project
+tags:
+  - aws
+  - terraform
+  - terraform-modules
+  - cicd
+  - codepipeline
+  - codebuild
+  - continuous-integration
+  - continuous-delivery
+
+# Categories of this project
+categories:
+  - terraform-modules/cicd
+
 # Logo for this project
 #logo: docs/logo.png
 
@@ -51,6 +66,7 @@ usage: |-
       # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
       build_image         = "aws/codebuild/docker:1.12.1"
       build_compute_type  = "BUILD_GENERAL1_SMALL"
+      build_timeout       = "60"
 
       # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
       # For more info:

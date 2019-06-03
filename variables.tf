@@ -33,6 +33,12 @@ variable "cache_bucket_suffix_enabled" {
   description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
 }
 
+variable "badge_enabled" {
+  type        = "string"
+  default     = "false"
+  description = "Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled."
+}
+
 variable "build_image" {
   type        = "string"
   default     = "aws/codebuild/docker:1.12.1"
@@ -43,6 +49,12 @@ variable "build_compute_type" {
   type        = "string"
   default     = "BUILD_GENERAL1_SMALL"
   description = "Instance type of the build instance"
+}
+
+variable "build_timeout" {
+  type        = "string"
+  default     = "60"
+  description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed."
 }
 
 variable "buildspec" {
@@ -133,4 +145,10 @@ variable "artifact_type" {
   type        = "string"
   default     = "CODEPIPELINE"
   description = "The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3."
+}
+
+variable "report_build_status" {
+  type        = "string"
+  default     = "false"
+  description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB."
 }

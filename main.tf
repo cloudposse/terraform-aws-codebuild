@@ -95,7 +95,18 @@ data "aws_iam_policy_document" "permissions" {
     sid = ""
 
     actions = [
-      "${var.default_role_actions}",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:CompleteLayerUpload",
+      "ecr:GetAuthorizationToken",
+      "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart",
+      "ecs:RunTask",
+      "iam:PassRole",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "ssm:GetParameters",
     ]
 
     effect = "Allow"
@@ -107,7 +118,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = "${var.enabled ? 1 : 0}"
+  count = "${var.enabled == "true" && var.cache_enabled == "true" ? 1 : 0}"
 
   statement {
     sid = ""
@@ -148,10 +159,11 @@ resource "null_resource" "env" {
 }
 
 resource "aws_codebuild_project" "default" {
-  count        = "${var.enabled ? 1 : 0}"
-  name         = "${module.label.id}"
-  service_role = "${aws_iam_role.default.arn}"
-  depends_on   = ["null_resource.env"]
+  count         = "${var.enabled == "true" ? 1 : 0}"
+  name          = "${module.label.id}"
+  service_role  = "${aws_iam_role.default.arn}"
+  badge_enabled = "${var.badge_enabled}"
+  build_timeout = "${var.build_timeout}"
 
   artifacts {
     type = "${var.artifact_type}"
@@ -195,9 +207,10 @@ resource "aws_codebuild_project" "default" {
   }
 
   source {
-    buildspec = "${var.buildspec}"
-    type      = "${var.source_type}"
-    location  = "${var.source_location}"
+    buildspec           = "${var.buildspec}"
+    type                = "${var.source_type}"
+    location            = "${var.source_location}"
+    report_build_status = "${var.report_build_status}"
   }
 
   tags = "${module.label.tags}"
