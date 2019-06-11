@@ -23,7 +23,7 @@ variable "enabled" {
 
 variable "cache_enabled" {
   type        = "string"
-  default     = true
+  default     = "true"
   description = "If cache_enabled is true, create an S3 bucket for storing codebuild cache inside"
 }
 
