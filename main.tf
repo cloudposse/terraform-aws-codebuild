@@ -31,7 +31,9 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${format("%v%v",module.label.id, var.cache_bucket_suffix_enabled ? "-${random_string.bucket_prefix.result}" : "" )}"
+  # Handle quoted and unquoted booleen values
+  cache_bucket_suffix_enabled = "${var.cache_bucket_suffix_enabled == true ? 1 : var.cache_bucket_suffix_enabled == "true"}"
+  cache_bucket_name           = "${format("%v%v",module.label.id, local.cache_bucket_suffix_enabled ? "-${random_string.bucket_prefix.result}" : "" )}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -49,8 +51,11 @@ locals {
     "without" = []
   }
 
+  # Handle quoted and unquoted booleen values
+  cache_enabled = "${var.cache_enabled == true ? 1 : var.cache_enabled == "true"}"
+
   # Final Map Selected from above
-  cache = "${local.cache_def[var.cache_enabled ? "with" : "without" ]}"
+  cache = "${local.cache_def[local.cache_enabled ? "with" : "without" ]}"
 }
 
 resource "aws_iam_role" "default" {
