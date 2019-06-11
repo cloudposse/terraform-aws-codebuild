@@ -3,7 +3,7 @@ data "aws_caller_identity" "default" {}
 data "aws_region" "default" {}
 
 resource "aws_s3_bucket" "cache_bucket" {
-  count         = "${var.enabled && var.cache_enabled ? 1 : 0}"
+  count         = "${var.enabled == "true" && var.cache_enabled ? 1 : 0}"
   bucket        = "${local.cache_bucket_name_normalised}"
   acl           = "private"
   force_destroy = true
@@ -31,9 +31,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  # Handle quoted and unquoted booleen values
-  cache_bucket_suffix_enabled = "${var.cache_bucket_suffix_enabled == true ? 1 : var.cache_bucket_suffix_enabled == "true"}"
-  cache_bucket_name           = "${format("%v%v",module.label.id, local.cache_bucket_suffix_enabled ? "-${random_string.bucket_prefix.result}" : "" )}"
+  cache_bucket_name = "${format("%v%v",module.label.id, var.cache_bucket_suffix_enabled == "true" ? "-${random_string.bucket_prefix.result}" : "" )}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -45,21 +43,18 @@ locals {
   cache_def = {
     "with" = [{
       type     = "S3"
-      location = "${var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none" }"
+      location = "${var.enabled == "true" && var.cache_enabled == "true" ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none" }"
     }]
 
     "without" = []
   }
 
-  # Handle quoted and unquoted booleen values
-  cache_enabled = "${var.cache_enabled == true ? 1 : var.cache_enabled == "true"}"
-
   # Final Map Selected from above
-  cache = "${local.cache_def[local.cache_enabled ? "with" : "without" ]}"
+  cache = "${local.cache_def[var.cache_enabled == "true" ? "with" : "without" ]}"
 }
 
 resource "aws_iam_role" "default" {
-  count              = "${var.enabled ? 1 : 0}"
+  count              = "${var.enabled == "true" ? 1 : 0}"
   name               = "${module.label.id}"
   assume_role_policy = "${data.aws_iam_policy_document.role.json}"
 }
@@ -82,14 +77,14 @@ data "aws_iam_policy_document" "role" {
 }
 
 resource "aws_iam_policy" "default" {
-  count  = "${var.enabled ? 1 : 0}"
+  count  = "${var.enabled == "true" ? 1 : 0}"
   name   = "${module.label.id}"
   path   = "/service-role/"
   policy = "${data.aws_iam_policy_document.permissions.json}"
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
-  count  = "${var.enabled && var.cache_enabled ? 1 : 0}"
+  count  = "${var.enabled == "true" && var.cache_enabled ? 1 : 0}"
   name   = "${module.label.id}-cache-bucket"
   path   = "/service-role/"
   policy = "${data.aws_iam_policy_document.permissions_cache_bucket.json}"
@@ -142,13 +137,13 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  count      = "${var.enabled ? 1 : 0}"
+  count      = "${var.enabled == "true" ? 1 : 0}"
   policy_arn = "${aws_iam_policy.default.arn}"
   role       = "${aws_iam_role.default.id}"
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
-  count      = "${var.enabled && var.cache_enabled ? 1 : 0}"
+  count      = "${var.enabled == "true" && var.cache_enabled == "true" ? 1 : 0}"
   policy_arn = "${element(aws_iam_policy.default_cache_bucket.*.arn, count.index)}"
   role       = "${aws_iam_role.default.id}"
 }
@@ -189,6 +184,9 @@ resource "aws_codebuild_project" "default" {
     type            = "LINUX_CONTAINER"
     privileged_mode = "${var.privileged_mode}"
 
+    ## If any of the environment values contain computed values that arent already available, 
+    ## an error occurs that doesn't directly show that it is because of a missing value.
+    ## When troubleshooting failures in this module, try removing environment variables first for testing.
     environment_variable = [{
       "name"  = "AWS_REGION"
       "value" = "${signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name}"
