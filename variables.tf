@@ -17,7 +17,7 @@ variable "description" {
 
 variable "enabled" {
   type        = "string"
-  default     = true
+  default     = "true"
   description = "A boolean to enable/disable resource creation"
 }
 
