@@ -51,7 +51,7 @@ Include this module in your existing terraform code:
 
 ```hcl
 module "label" {
-  source    = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.11.1"
+  source    = "git::https://github.com/cloudposse/terraform-null-label.git?ref=master"
   namespace = "general"
   name      = "ci"
   stage     = "staging"
