@@ -67,7 +67,7 @@ locals {
   }
 
   # Final Map Selected from above
-  cache = local.cache_def[var.cache_enabled]
+  cache = local.cache_def[var.cache_enabled ? "true" : "false"]
 }
 
 resource "aws_iam_role" "default" {
