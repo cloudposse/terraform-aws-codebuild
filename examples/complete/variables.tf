@@ -1,12 +1,14 @@
+variable "region" {
+  type = string
+}
+
 variable "namespace" {
   type        = string
-  default     = ""
   description = "Namespace, which could be your organization name, e.g. 'eg' or 'cp'"
 }
 
 variable "stage" {
   type        = string
-  default     = ""
   description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
 }
 
@@ -50,7 +52,7 @@ variable "cache_expiration_days" {
 
 variable "cache_bucket_suffix_enabled" {
   type        = bool
-  default     = true
+  default     = false
   description = "The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value"
 }
 
@@ -107,36 +109,6 @@ variable "privileged_mode" {
   description = "(Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images"
 }
 
-variable "github_token" {
-  type        = string
-  default     = ""
-  description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
-}
-
-variable "aws_region" {
-  type        = string
-  default     = ""
-  description = "(Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
-variable "aws_account_id" {
-  type        = string
-  default     = ""
-  description = "(Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
-variable "image_repo_name" {
-  type        = string
-  default     = "UNSET"
-  description = "(Optional) ECR repository name to store the Docker image built by this module. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
-variable "image_tag" {
-  type        = string
-  default     = "latest"
-  description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
-}
-
 variable "source_type" {
   type        = string
   default     = "CODEPIPELINE"
@@ -146,7 +118,7 @@ variable "source_type" {
 variable "source_location" {
   type        = string
   default     = ""
-  description = "The location of the source code from git or s3"
+  description = "The location of the source code from git or s3."
 }
 
 variable "artifact_type" {

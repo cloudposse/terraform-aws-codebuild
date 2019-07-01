@@ -3,7 +3,7 @@
 
 [![Cloud Posse][logo]](https://cpco.io/homepage)
 
-# terraform-aws-codebuild [![Build Status](https://travis-ci.org/cloudposse/terraform-aws-codebuild.svg?branch=master)](https://travis-ci.org/cloudposse/terraform-aws-codebuild) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+# terraform-aws-codebuild [![Codefresh Build Status](https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-codebuild?type=cf-1)](https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d198705e38a0429d812f7e4) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 
 
 Terraform module to create AWS CodeBuild project for AWS CodePipeline.
@@ -52,21 +52,21 @@ Include this module in your existing terraform code:
 ```hcl
 module "build" {
     source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
-    namespace           = "general"
-    name                = "ci"
+    namespace           = "eg"
     stage               = "staging"
+    name                = "app"
 
     # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
-    build_image         = "aws/codebuild/docker:1.12.1"
+    build_image         = "aws/codebuild/standard:2.0"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
-    build_timeout       = "60"
+    build_timeout       = 60
 
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
     # For more info:
     # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
     # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
 
-    privileged_mode     = "true"
+    privileged_mode     = true
     aws_region          = "us-east-1"
     aws_account_id      = "xxxxxxxxxx"
     image_repo_name     = "ecr-repo-name"
@@ -89,19 +89,6 @@ module "build" {
 }
 ```
 
-### To hide warnings about unset versions in providers
-
-Add this to your .tf files
-```hcl
-provider "random" {
-  version = "~> 1.0"
-}
-
-provider "null" {
-  version = "~> 1.0"
-}
-```
-
 
 
 
@@ -121,32 +108,32 @@ Available targets:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| artifact_type | The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3. | string | `CODEPIPELINE` | no |
-| attributes | Additional attributes (e.g. `policy` or `role`) | list | `<list>` | no |
+| artifact_type | The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3 | string | `CODEPIPELINE` | no |
+| attributes | Additional attributes (e.g. `policy` or `role`) | list(string) | `<list>` | no |
 | aws_account_id | (Optional) AWS Account ID. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
 | aws_region | (Optional) AWS Region, e.g. us-east-1. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `` | no |
-| badge_enabled | Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled. | string | `false` | no |
+| badge_enabled | Generates a publicly-accessible URL for the projects build badge. Available as badge_url attribute when enabled | bool | `false` | no |
 | build_compute_type | Instance type of the build instance | string | `BUILD_GENERAL1_SMALL` | no |
-| build_image | Docker image for build environment, e.g. 'aws/codebuild/docker:1.12.1' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/docker:1.12.1` | no |
-| build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | string | `60` | no |
+| build_image | Docker image for build environment, e.g. 'aws/codebuild/standard:2.0' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/standard:2.0` | no |
+| build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed | string | `60` | no |
 | buildspec | Optional buildspec declaration to use for building the project | string | `` | no |
-| cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value | string | `true` | no |
-| cache_enabled | If cache_enabled is true, create an S3 bucket for storing codebuild cache inside | string | `true` | no |
+| cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value | bool | `true` | no |
+| cache_enabled | If cache_enabled is true, create an S3 bucket for storing codebuild cache inside | bool | `true` | no |
 | cache_expiration_days | How many days should the build cache be kept | string | `7` | no |
 | delimiter | Delimiter to be used between `name`, `namespace`, `stage`, etc. | string | `-` | no |
-| enabled | A boolean to enable/disable resource creation | string | `true` | no |
-| environment_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build. | list | `<list>` | no |
+| enabled | A boolean to enable/disable resource creation | bool | `true` | no |
+| environment_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | object | `<list>` | no |
 | github_token | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`) | string | `` | no |
 | image_repo_name | (Optional) ECR repository name to store the Docker image built by this module. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `UNSET` | no |
 | image_tag | (Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `latest` | no |
-| name | Solution name, e.g. 'app' or 'jenkins' | string | `codebuild` | no |
-| namespace | Namespace, which could be your organization name, e.g. 'cp' or 'cloudposse' | string | `global` | no |
-| privileged_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | string | `false` | no |
-| report_build_status | Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB. | string | `false` | no |
-| source_location | The location of the source code from git or s3. | string | `` | no |
-| source_type | The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3. | string | `CODEPIPELINE` | no |
-| stage | Stage, e.g. 'prod', 'staging', 'dev', or 'test' | string | `default` | no |
-| tags | Additional tags (e.g. `map('BusinessUnit', 'XYZ')` | map | `<map>` | no |
+| name | Solution name, e.g. 'app' or 'jenkins' | string | - | yes |
+| namespace | Namespace, which could be your organization name, e.g. 'eg' or 'cp' | string | `` | no |
+| privileged_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | bool | `false` | no |
+| report_build_status | Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB | bool | `false` | no |
+| source_location | The location of the source code from git or s3 | string | `` | no |
+| source_type | The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3 | string | `CODEPIPELINE` | no |
+| stage | Stage, e.g. 'prod', 'staging', 'dev', or 'test' | string | `` | no |
+| tags | Additional tags (e.g. `map('BusinessUnit', 'XYZ')` | map(string) | `<map>` | no |
 
 ## Outputs
 
