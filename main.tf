@@ -35,6 +35,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 }
 
 resource "random_string" "bucket_prefix" {
+  count   = var.enabled ? 1 : 0
   length  = 12
   number  = false
   upper   = false
@@ -43,7 +44,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.label.id}${var.cache_bucket_suffix_enabled ? "-${random_string.bucket_prefix.result}" : ""}"
+  cache_bucket_name = "${module.label.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -104,7 +105,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
   count  = var.enabled && var.cache_enabled ? 1 : 0
   name   = "${module.label.id}-cache-bucket"
   path   = "/service-role/"
-  policy = data.aws_iam_policy_document.permissions_cache_bucket[0].json
+  policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
 data "aws_iam_policy_document" "permissions" {
@@ -147,28 +148,28 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
     effect = "Allow"
 
     resources = [
-      aws_s3_bucket.cache_bucket[0].arn,
-      "${aws_s3_bucket.cache_bucket[0].arn}/*",
+      join("", aws_s3_bucket.cache_bucket.*.arn),
+      "${join("", aws_s3_bucket.cache_bucket.*.arn)}/*",
     ]
   }
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
   count      = var.enabled ? 1 : 0
-  policy_arn = aws_iam_policy.default[0].arn
-  role       = aws_iam_role.default[0].id
+  policy_arn = join("", aws_iam_policy.default.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = var.enabled && var.cache_enabled ? 1 : 0
-  policy_arn = aws_iam_policy.default_cache_bucket.*.arn[count.index]
-  role       = aws_iam_role.default[0].id
+  policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_codebuild_project" "default" {
   count         = var.enabled ? 1 : 0
   name          = module.label.id
-  service_role  = aws_iam_role.default[0].arn
+  service_role  = join("", aws_iam_role.default.*.arn)
   badge_enabled = var.badge_enabled
   build_timeout = var.build_timeout
 
