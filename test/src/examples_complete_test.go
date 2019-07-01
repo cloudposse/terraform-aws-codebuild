@@ -31,4 +31,11 @@ func TestExamplesComplete(t *testing.T) {
 	expectedProjectName := "eg-test-cedebuild-test"
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedProjectName, projectName)
+
+	// Run `terraform output` to get the value of an output variable
+	cacheS3BucketName := terraform.Output(t, terraformOptions, "cache_bucket_name")
+
+	expectedCacheS3BucketName := "eg-test-cedebuild-test"
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, expectedCacheS3BucketName, cacheS3BucketName)
 }

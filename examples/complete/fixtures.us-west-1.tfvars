@@ -6,6 +6,10 @@ stage = "test"
 
 name = "cedebuild-test"
 
+cache_enabled = true
+
+cache_bucket_suffix_enabled = false
+
 environment_variables = [
   {
     name  = "APP_URL"
