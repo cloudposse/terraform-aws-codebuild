@@ -61,7 +61,7 @@ locals {
       {
         type     = "S3"
         location = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
-      },
+      }
     ]
     "false" = []
   }
@@ -177,7 +177,7 @@ resource "aws_codebuild_project" "default" {
   }
 
   dynamic "cache" {
-    for_each = [local.cache]
+    for_each = local.cache
     content {
       location = lookup(cache.value, "location", null)
       modes    = lookup(cache.value, "modes", null)
