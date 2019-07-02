@@ -113,6 +113,7 @@ data "aws_iam_policy_document" "permissions" {
     sid = ""
 
     actions = [
+      "codecommit:GitPull",
       "ecr:BatchCheckLayerAvailability",
       "ecr:CompleteLayerUpload",
       "ecr:GetAuthorizationToken",
