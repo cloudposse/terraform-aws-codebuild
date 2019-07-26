@@ -173,6 +173,7 @@ resource "aws_codebuild_project" "default" {
   badge_enabled = var.badge_enabled
   build_timeout = var.build_timeout
 
+
   artifacts {
     type = var.artifact_type
   }
@@ -231,6 +232,7 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
+    git_clone_depth = var.source_git_clone_depth
   }
 
   tags = module.label.tags

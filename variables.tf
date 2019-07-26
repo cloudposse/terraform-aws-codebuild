@@ -143,6 +143,12 @@ variable "source_type" {
   description = "The type of repository that contains the source code to be built. Valid values for this parameter are: CODECOMMIT, CODEPIPELINE, GITHUB, GITHUB_ENTERPRISE, BITBUCKET or S3"
 }
 
+variable "source_git_clone_depth" {
+  type        = string
+  default     = ""
+  description = "Truncate git history to this many commits."
+}
+
 variable "source_location" {
   type        = string
   default     = ""
