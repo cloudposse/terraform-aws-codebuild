@@ -57,18 +57,20 @@ locals {
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
   ## aws_codebuild_project
-  cache_def = {
-    "true" = [
-      {
-        type     = "S3"
-        location = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
-      }
-    ]
-    "false" = []
+  cache_options = {
+    "S3" = {
+      type     = "S3"
+      location = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
+
+    },
+    "LOCAL" = {
+      type  = "LOCAL"
+      modes = var.local_cache_modes
+    }
   }
 
   # Final Map Selected from above
-  cache = local.cache_def[var.cache_enabled ? "true" : "false"]
+  cache = var.cache_enabled && var.cache_type != "" ? local.cache_options[var.cache_type]: {}
 }
 
 resource "aws_iam_role" "default" {
