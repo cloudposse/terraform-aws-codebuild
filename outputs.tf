@@ -20,12 +20,12 @@ output "role_arn" {
 
 output "cache_bucket_name" {
   description = "Cache S3 bucket name"
-  value       = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "UNSET"
+  value       = var.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "UNSET"
 }
 
 output "cache_bucket_arn" {
   description = "Cache S3 bucket ARN"
-  value       = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.arn) : "UNSET"
+  value       = var.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.arn) : "UNSET"
 }
 
 output "badge_url" {
