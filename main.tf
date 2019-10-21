@@ -125,6 +125,8 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "ec2:DescribeSecurityGroups",
+      "ec2:DeleteNetworkInterface",
+      "ec2:CreateNetworkInterface",
       "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeSubnets",
       "ssm:GetParameters",
