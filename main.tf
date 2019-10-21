@@ -124,6 +124,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "ec2:DescribeSecurityGroups",
       "ssm:GetParameters",
     ]
 
