@@ -109,7 +109,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 }
 
 resource "aws_iam_policy" "default_pipeline_bucket" {
-  count  = var.enabled && var.cache_enabled ? 1 : 0
+  count  = var.enabled && length(var.source_s3_bucket_arn) > 0 ? 1 : 0
   name   = "${module.label.id}-pipeline-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_source_bucket.*.json)
@@ -194,7 +194,7 @@ resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default_source_bucket" {
-  count      = var.enabled && var.cache_enabled ? 1 : 0
+  count      = var.enabled && length(var.source_s3_bucket_arn) > 0 ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_pipeline_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
