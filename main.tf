@@ -163,7 +163,7 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 }
 
 data "aws_iam_policy_document" "permissions_source_bucket" {
-  count = var.enabled && var.source_s3_bucket_arn ? 1 : 0
+  count = var.enabled && length(var.source_s3_bucket_arn) > 0 ? 1 : 0
 
   statement {
     sid = ""
