@@ -149,6 +149,11 @@ variable "source_location" {
   description = "The location of the source code from git or s3"
 }
 
+variable "source_s3_bucket_arn" {
+  type = string
+  description = "S3 bucket arn code pipeline uses to drop artifacts into."
+}
+
 variable "artifact_type" {
   type        = string
   default     = "CODEPIPELINE"
