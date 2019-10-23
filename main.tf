@@ -175,8 +175,8 @@ data "aws_iam_policy_document" "permissions_source_bucket" {
     effect = "Allow"
 
     resources = [
-      join("", var.source_s3_bucket_arn),
-      "${join("", var.source_s3_bucket_arn)}/*",
+      var.source_s3_bucket_arn,
+      "${var.source_s3_bucket_arn}/*",
     ]
   }
 }
