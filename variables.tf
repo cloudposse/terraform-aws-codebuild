@@ -174,6 +174,10 @@ variable "subnet_ids" {
   default = "subnets this build has access to"
 }
 
+variable "s3_bucket_enabled" {
+  description = "whether or not an S3 bucket is enabled for the codebuild project"
+}
+
 variable "vpc_id" {
   description = "VPC id this build belongs to"
 }
