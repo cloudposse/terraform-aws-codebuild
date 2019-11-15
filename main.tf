@@ -109,7 +109,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 }
 
 resource "aws_iam_policy" "default_pipeline_bucket" {
-  count  = var.enabled && length(var.source_s3_bucket_arn) > 0 ? 1 : 0
+  count  = var.s3_bucket_enabled ? 1 : 0
   name   = "${module.label.id}-pipeline-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_source_bucket.*.json)
