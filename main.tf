@@ -194,7 +194,7 @@ resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default_source_bucket" {
-  count      = var.enabled && length(var.s) > 0 ? 1 : 0
+  count      = var.enabled && length(var.s3_bucket_enabled) > 0 ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_pipeline_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
