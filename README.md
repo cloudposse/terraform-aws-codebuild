@@ -156,15 +156,16 @@ Available targets:
 | build_image | Docker image for build environment, e.g. 'aws/codebuild/standard:2.0' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | string | `aws/codebuild/standard:2.0` | no |
 | build_timeout | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed | string | `60` | no |
 | buildspec | Optional buildspec declaration to use for building the project | string | `` | no |
-| cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value | bool | `true` | no |
-| cache_enabled | If cache_enabled is true, create an S3 bucket for storing codebuild cache inside | bool | `true` | no |
-| cache_expiration_days | How many days should the build cache be kept | string | `7` | no |
+| cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value. It only works when cache_type is 'S3 | bool | `true` | no |
+| cache_expiration_days | How many days should the build cache be kept. It only works when cache_type is 'S3' | string | `7` | no |
+| cache_type | The type of storage that will be used for the AWS CodeBuild project cache. Valid values: NO_CACHE, LOCAL, and S3.  Defaults to NO_CACHE.  If cache_type is true, it will create an S3 bucket for storing codebuild cache inside | string | `NO_CACHE` | no |
 | delimiter | Delimiter to be used between `name`, `namespace`, `stage`, etc. | string | `-` | no |
 | enabled | A boolean to enable/disable resource creation | bool | `true` | no |
 | environment_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | object | `<list>` | no |
 | github_token | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`) | string | `` | no |
 | image_repo_name | (Optional) ECR repository name to store the Docker image built by this module. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `UNSET` | no |
 | image_tag | (Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `latest` | no |
+| local_cache_modes | Specifies settings that AWS CodeBuild uses to store and reuse build dependencies. Valid values: LOCAL_SOURCE_CACHE, LOCAL_DOCKER_LAYER_CACHE, and LOCAL_CUSTOM_CACHE | list(string) | `<list>` | no |
 | name | Solution name, e.g. 'app' or 'jenkins' | string | - | yes |
 | namespace | Namespace, which could be your organization name, e.g. 'eg' or 'cp' | string | `` | no |
 | privileged_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | bool | `false` | no |
