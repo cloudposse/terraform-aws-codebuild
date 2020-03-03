@@ -158,7 +158,7 @@ Available targets:
 | buildspec | Optional buildspec declaration to use for building the project | string | `` | no |
 | cache_bucket_suffix_enabled | The cache bucket generates a random 13 character string to generate a unique bucket name. If set to false it uses terraform-null-label's id value. It only works when cache_type is 'S3 | bool | `true` | no |
 | cache_expiration_days | How many days should the build cache be kept. It only works when cache_type is 'S3' | string | `7` | no |
-| cache_type | The type of storage that will be used for the AWS CodeBuild project cache. Valid values: NO_CACHE, LOCAL, and S3.  Defaults to NO_CACHE.  If cache_type is true, it will create an S3 bucket for storing codebuild cache inside | string | `NO_CACHE` | no |
+| cache_type | The type of storage that will be used for the AWS CodeBuild project cache. Valid values: NO_CACHE, LOCAL, and S3.  Defaults to NO_CACHE.  If cache_type is S3, it will create an S3 bucket for storing codebuild cache inside | string | `NO_CACHE` | no |
 | delimiter | Delimiter to be used between `name`, `namespace`, `stage`, etc. | string | `-` | no |
 | enabled | A boolean to enable/disable resource creation | bool | `true` | no |
 | environment_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | object | `<list>` | no |
