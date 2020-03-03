@@ -26,4 +26,4 @@ environment_variables = [
 
 cache_expiration_days = 7
 
-cache_type = "NO_CACHE"
+cache_type = "S3"
