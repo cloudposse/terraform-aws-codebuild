@@ -15,7 +15,7 @@ module "label" {
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
-  count         = var.enabled && var.cache_enabled ? 1 : 0
+  count         = var.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
@@ -54,21 +54,28 @@ locals {
     min(length(local.cache_bucket_name), 63),
   )
 
+  s3_cache_enabled = var.cache_type == "S3"
+
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
   ## aws_codebuild_project
-  cache_def = {
-    "true" = [
-      {
-        type     = "S3"
-        location = var.enabled && var.cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
-      }
-    ]
-    "false" = []
+  cache_options = {
+    "S3" = {
+      type     = "S3"
+      location = var.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
+
+    },
+    "LOCAL" = {
+      type  = "LOCAL"
+      modes = var.local_cache_modes
+    },
+    "NO_CACHE" = {
+      type = "NO_CACHE"
+    }
   }
 
   # Final Map Selected from above
-  cache = local.cache_def[var.cache_enabled ? "true" : "false"]
+  cache = local.cache_options[var.cache_type]
 }
 
 resource "aws_iam_role" "default" {
@@ -102,7 +109,7 @@ resource "aws_iam_policy" "default" {
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
-  count  = var.enabled && var.cache_enabled ? 1 : 0
+  count  = var.enabled && local.s3_cache_enabled ? 1 : 0
   name   = "${module.label.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
@@ -136,7 +143,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = var.enabled && var.cache_enabled ? 1 : 0
+  count = var.enabled && local.s3_cache_enabled ? 1 : 0
 
   statement {
     sid = ""
@@ -161,7 +168,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
-  count      = var.enabled && var.cache_enabled ? 1 : 0
+  count      = var.enabled && local.s3_cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
@@ -177,13 +184,10 @@ resource "aws_codebuild_project" "default" {
     type = var.artifact_type
   }
 
-  dynamic "cache" {
-    for_each = local.cache
-    content {
-      location = lookup(cache.value, "location", null)
-      modes    = lookup(cache.value, "modes", null)
-      type     = lookup(cache.value, "type", null)
-    }
+  cache {
+    type     = lookup(local.cache, "type", null)
+    location = lookup(local.cache, "location", null)
+    modes    = lookup(local.cache, "modes", null)
   }
 
   environment {
