@@ -138,8 +138,9 @@ data "aws_iam_policy_document" "permissions" {
       "ssm:GetParameters",
       "ec2:*",
       "secretsmanager:GetSecretValue",
+      "ec2:*",
     ], var.extra_permissions))
-
+      
     effect = "Allow"
 
     resources = [
@@ -329,5 +330,13 @@ resource "aws_codebuild_project" "default" {
       }
     }
   }
+
+  vpc_config {
+    vpc_id             = var.vpc_id
+    subnets            = var.vpc_subnet_ids
+    security_group_ids = var.vpc_security_group_ids
+  }
+
+  tags = module.label.tags
 }
 

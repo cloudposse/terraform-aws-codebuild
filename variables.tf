@@ -238,6 +238,19 @@ variable "extra_permissions" {
   type        = list
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
+variable "vpc_id" {
+  type    = string
+  default = ""
+}
+
+variable "vpc_subnet_ids" {
+  type    = list
+  default = []
+}
+
+variable "vpc_security_group_ids" {
+  type    = list
+  default = []
 }
 
 variable "git_clone_depth" {
