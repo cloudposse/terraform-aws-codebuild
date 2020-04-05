@@ -133,6 +133,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "ssm:GetParameters",
+      "ec2:*"
     ]
 
     effect = "Allow"
@@ -236,6 +237,13 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
+  }
+
+
+  vpc_config {
+    vpc_id             = var.vpc_id
+    subnets            = var.vpc_subnet_ids
+    security_group_ids = var.vpc_security_group_ids
   }
 
   tags = module.label.tags
