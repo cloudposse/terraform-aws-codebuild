@@ -16,6 +16,7 @@ module "label" {
 
 resource "aws_s3_bucket" "cache_bucket" {
   count         = var.enabled && local.s3_cache_enabled ? 1 : 0
+
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
@@ -36,6 +37,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 
 resource "random_string" "bucket_prefix" {
   count   = var.enabled ? 1 : 0
+  
   length  = 12
   number  = false
   upper   = false
@@ -80,11 +82,13 @@ locals {
 
 resource "aws_iam_role" "default" {
   count              = var.enabled ? 1 : 0
+
   name               = module.label.id
   assume_role_policy = data.aws_iam_policy_document.role.json
 }
 
 data "aws_iam_policy_document" "role" {
+  
   statement {
     sid = ""
 
@@ -103,6 +107,7 @@ data "aws_iam_policy_document" "role" {
 
 resource "aws_iam_policy" "default" {
   count  = var.enabled ? 1 : 0
+  
   name   = module.label.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.permissions.json
@@ -110,12 +115,15 @@ resource "aws_iam_policy" "default" {
 
 resource "aws_iam_policy" "default_cache_bucket" {
   count  = var.enabled && local.s3_cache_enabled ? 1 : 0
+  
+
   name   = "${module.label.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
 data "aws_iam_policy_document" "permissions" {
+  
   statement {
     sid = ""
 
@@ -145,7 +153,7 @@ data "aws_iam_policy_document" "permissions" {
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
   count = var.enabled && local.s3_cache_enabled ? 1 : 0
-
+  
   statement {
     sid = ""
 
@@ -164,22 +172,36 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 
 resource "aws_iam_role_policy_attachment" "default" {
   count      = var.enabled ? 1 : 0
+  
   policy_arn = join("", aws_iam_policy.default.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = var.enabled && local.s3_cache_enabled ? 1 : 0
+  
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
+resource "aws_codebuild_source_credential" "authorization" {
+  count       = var.enabled && var.private_repository ? 1 : 0
+  
+  auth_type   = var.source_credential_auth_type
+  server_type = var.source_credential_server_type
+  token       = var.source_credential_token
+  user_name   = var.source_credential_user_name
+}
+
 resource "aws_codebuild_project" "default" {
-  count         = var.enabled ? 1 : 0
-  name          = module.label.id
-  service_role  = join("", aws_iam_role.default.*.arn)
-  badge_enabled = var.badge_enabled
-  build_timeout = var.build_timeout
+  count           = var.enabled ? 1 : 0
+  
+  name            = module.label.id
+  service_role    = join("", aws_iam_role.default.*.arn)
+  badge_enabled   = var.badge_enabled
+  build_timeout   = var.build_timeout
+  source_version  = var.source_version != "" ? var.source_version : null
+  tags            = module.label.tags
 
   artifacts {
     type = var.artifact_type
@@ -236,7 +258,58 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
+    git_clone_depth     = var.git_clone_depth
+    
+    dynamic "auth" {
+      for_each = var.private_repository ? [""] : []
+      content {
+        type     = "OAUTH"
+        resource = join("", aws_codebuild_source_credential.authorization.*.id)
+      }
+    }
+
+    dynamic "git_submodules_config" {
+      for_each = var.fetch_git_submodules ? [""] : []
+      content {
+        fetch_submodules = true
+      }
+      
+    }
+
   }
 
-  tags = module.label.tags
+  dynamic "vpc_config" {
+    for_each = length(var.vpc_config) > 0 ? [""] : []
+    content {
+      vpc_id              = lookup(var.vpc_config, "vpc_id", null)
+      subnets             = lookup(var.vpc_config, "subnets", null)
+      security_group_ids  = lookup(var.vpc_config, "security_group_ids", null)
+    }
+
+  }
+
+  dynamic "logs_config" {
+    for_each = length(var.logs_config) > 0 ? [""] : []
+    content {
+      dynamic "cloudwatch_logs" {
+        for_each = contains(keys(var.logs_config), "cloudwatch_logs") ? {key = var.logs_config["cloudwatch_logs"]} : {}
+        content {
+          status      = lookup(cloudwatch_logs.value, "status", null)
+          group_name  = lookup(cloudwatch_logs.value, "group_name", null)
+          stream_name = lookup(cloudwatch_logs.value, "stream_name", null)
+        }
+      }
+
+      dynamic "s3_logs" {
+        for_each = contains(keys(var.logs_config), "s3_logs") ? {key = var.logs_config["s3_logs"]} : {}
+        content {
+          status              = lookup(s3_logs.value, "status", null)
+          location            = lookup(s3_logs.value, "location", null)
+          encryption_disabled = lookup(s3_logs.value, "encryption_disabled", null)
+        }
+      }
+    }
+  }
+
 }
+
