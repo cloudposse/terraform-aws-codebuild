@@ -82,6 +82,7 @@ resource "aws_iam_role" "default" {
   count              = var.enabled ? 1 : 0
   name               = module.label.id
   assume_role_policy = data.aws_iam_policy_document.role.json
+  force_detach_policies = true
 }
 
 data "aws_iam_policy_document" "role" {
