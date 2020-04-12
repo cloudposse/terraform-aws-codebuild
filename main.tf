@@ -191,7 +191,11 @@ resource "aws_codebuild_project" "default" {
   badge_enabled   = var.badge_enabled
   build_timeout   = var.build_timeout
   source_version  = var.source_version != "" ? var.source_version : null
-  tags            = module.label.tags
+  tags            = {
+    for name, value in module.label.tags:
+      name => value
+    if length(value) > 0
+  }
 
   artifacts {
     type = var.artifact_type
