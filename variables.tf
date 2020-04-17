@@ -72,12 +72,6 @@ variable "build_image" {
   description = "Docker image for build environment, e.g. 'aws/codebuild/standard:2.0' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html"
 }
 
-variable "build_type" {
-  type        = string
-  default     = "LINUX_CONTAINER"
-  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
-}
-
 variable "build_compute_type" {
   type        = string
   default     = "BUILD_GENERAL1_SMALL"
@@ -87,6 +81,12 @@ variable "build_compute_type" {
 variable "build_timeout" {
   default     = 60
   description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
+}
+
+variable "build_type" {
+  type        = string
+  default     = "LINUX_CONTAINER"
+  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
 }
 
 variable "buildspec" {
