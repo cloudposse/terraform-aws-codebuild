@@ -83,6 +83,12 @@ variable "build_timeout" {
   description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
 }
 
+variable "build_environment_type" {
+  type        = string
+  default     = "LINUX_CONTAINER"
+  description = "Environment Type for build. Valid values: WINDOWS_CONTAINER, LINUX_CONTAINER, LINUX_GPU_CONTAINER, ARM_CONTAINER"
+}
+
 variable "buildspec" {
   type        = string
   default     = ""
