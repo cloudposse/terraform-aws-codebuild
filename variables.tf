@@ -107,10 +107,10 @@ variable "privileged_mode" {
   description = "(Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images"
 }
 
-variable "github_secret" {
+variable "github_token" {
   type        = string
   default     = ""
-  description = "Secret ARN for github token key"
+  description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
 }
 
 variable "aws_region" {

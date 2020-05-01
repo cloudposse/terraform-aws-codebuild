@@ -247,8 +247,7 @@ resource "aws_codebuild_project" "default" {
     }
     environment_variable {
       name  = "GITHUB_TOKEN"
-      value = var.github_secret
-      type  = "SECRETS_MANAGER"
+      value = signum(length(var.github_token)) == 1 ? var.github_token : "UNSET"
     }
 
     dynamic "environment_variable" {
