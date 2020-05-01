@@ -108,6 +108,13 @@ resource "aws_iam_policy" "default_cache_bucket" {
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
+resource "aws_iam_policy" "default_pipeline_bucket" {
+  count  = var.s3_bucket_enabled ? 1 : 0
+  name   = "${module.label.id}-pipeline-bucket"
+  path   = "/service-role/"
+  policy = join("", data.aws_iam_policy_document.permissions_source_bucket.*.json)
+}
+
 data "aws_iam_policy_document" "permissions" {
   statement {
     sid = ""
@@ -124,6 +131,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "ec2:*",
       "ssm:GetParameters",
     ]
 
@@ -154,6 +162,25 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
   }
 }
 
+data "aws_iam_policy_document" "permissions_source_bucket" {
+  count = var.s3_bucket_enabled ? 1 : 0
+
+  statement {
+    sid = ""
+
+    actions = [
+      "s3:*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      var.source_s3_bucket_arn,
+      "${var.source_s3_bucket_arn}/*",
+    ]
+  }
+}
+
 resource "aws_iam_role_policy_attachment" "default" {
   count      = var.enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default.*.arn)
@@ -163,6 +190,12 @@ resource "aws_iam_role_policy_attachment" "default" {
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = var.enabled && var.cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
+}
+
+resource "aws_iam_role_policy_attachment" "default_source_bucket" {
+  count      = var.s3_bucket_enabled ? 1 : 0
+  policy_arn = join("", aws_iam_policy.default_pipeline_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
@@ -232,6 +265,12 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
+  }
+
+  vpc_config {
+    security_group_ids = var.security_group_ids
+    subnets            = var.subnet_ids
+    vpc_id             = var.vpc_id
   }
 
   tags = module.label.tags

@@ -149,6 +149,11 @@ variable "source_location" {
   description = "The location of the source code from git or s3"
 }
 
+variable "source_s3_bucket_arn" {
+  type = string
+  description = "S3 bucket arn code pipeline uses to drop artifacts into."
+}
+
 variable "artifact_type" {
   type        = string
   default     = "CODEPIPELINE"
@@ -160,3 +165,20 @@ variable "report_build_status" {
   default     = false
   description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB"
 }
+
+variable "security_group_ids" {
+  default = "security groups"
+}
+
+variable "subnet_ids" {
+  default = "subnets this build has access to"
+}
+
+variable "s3_bucket_enabled" {
+  description = "whether or not an S3 bucket is enabled for the codebuild project"
+}
+
+variable "vpc_id" {
+  description = "VPC id this build belongs to"
+}
+
