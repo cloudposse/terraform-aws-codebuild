@@ -35,34 +35,28 @@ CMD [ "npm", "start"]
 
 * Run `docker build . -t sample-app:latest`to test your docker build locally.
 
-* You need to place the following `YAML` file into your application root folder.
-File name: `builspec.yml`
+* You need to place the following `YAML` file into your application root folder.(Ex: Where package.json is located) (You can find the sample file in example folder)
+
+Sample `builspec.yml`
 ```yaml
 version: 0.2
 
 phases:
-  install:
-    commands:
-
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-      - REPOSITORY_URL=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      - echo REPOSITORY_URL = $REPOSITORY_URL
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build . -t $IMAGE_REPO_NAME:$IMAGE_TAG
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URL:$IMAGE_TAG
-
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $REPOSITORY_URL:$IMAGE_TAG
-
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
 ```
 
 
@@ -87,10 +81,12 @@ Edit following fields in `build.auto.tfvars.json`
   "stage":"tests",
   "repository_name":"sample-app",
   "image_tag":"latest",
-  "source_credential_user_name":"*** enter-your-bitbucket-username ***",
-  "source_credential_token":"*** enter-your-bitbucket-password ***",
-  "source_location": "*** enter-your-repository-address ***",
-  "source_version": "*** enter-your-branch-to-test",
+  "source_credential_user_name":"<ENTER-YOUR-BITBUCKET-USERNAME>",
+  "source_credential_token":"<ENTER-YOUR-BITBUCKET-PASSWORD",
+  "source_location": "https://bitbucket.org/<YOUR_USER>/<YOUR_REPO>.git",
+  "source_version": "<ENTER-YOUR-BRANCH-TO-TEST (Remove line if you work with master)",
+  "git_clone_depth": null,
+  "extra_permissions": ["EC2:*"],
   "environment_variables":[
     {
       "name":"APP_NAME",
@@ -110,10 +106,11 @@ Edit following fields in `build.auto.tfvars.json`
 _Where:_
 
 * `source_location` is your private repository URL.
-* `source_version` is branch in your repository, which you would like to make a test build.
+* `source_version` is branch in your repository, which you would like to make a test build. (Remove it, if you want to work with master.)
 * `source_credential_user_name` is your `Bitbucket` user name.
 * `source_credential_token`is your `Bitbucket` password. (You can create it from here: https://bitbucket.org/account/settings/app-passwords/)
-
+* `extra_permissions` is a list of actions to be appended to IAM permissions
+* `git_clone_depth` is used to make a shallow clone for large repositories.
 _Note:_
 
 Application name will be created as `namespace-stage-repository_name`. If you omit name space and stage then your application name becomes just `repository_name`

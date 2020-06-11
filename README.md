@@ -163,8 +163,9 @@ Available targets:
 | delimiter | Delimiter to be used between `name`, `namespace`, `stage`, etc. | string | `-` | no |
 | enabled | A boolean to enable/disable resource creation | bool | `true` | no |
 | environment_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | object | `<list>` | no |
+| extra_permissions | List of action strings which will be added to IAM service account permissions. | list | `<list>` | no |
 | fetch_git_submodules | If set to true, fetches Git submodules for the AWS CodeBuild build project. | bool | `false` | no |
-| git_clone_depth | Truncate git history to this many commits. | number | `1` | no |
+| git_clone_depth | Truncate git history to this many commits. | number | `null` | no |
 | github_token | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`) | string | `` | no |
 | image_repo_name | (Optional) ECR repository name to store the Docker image built by this module. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `UNSET` | no |
 | image_tag | (Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html | string | `latest` | no |

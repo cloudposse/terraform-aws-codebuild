@@ -229,7 +229,7 @@ variable "report_build_status" {
 
 variable "git_clone_depth" {
   type        = number
-  default     = 1
+  default     = null
   description = "Truncate git history to this many commits."
 }
 
@@ -285,4 +285,10 @@ variable "logs_config" {
   type        = any
   default     = {}
   description = "Configuration for the builds to store log data to CloudWatch or S3."
+}
+
+variable "extra_permissions" {
+  type        = list
+  default     = []
+  description = "List of action strings which will be added to IAM service account permissions."
 }

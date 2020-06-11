@@ -1,6 +1,6 @@
 
 module "build" {
-    source                          = "git::https://github.com/brcnblc/terraform-aws-codebuild"
+    source                          = "../.."
     
     namespace           = var.namespace
     stage               = var.stage
@@ -17,6 +17,9 @@ module "build" {
     image_repo_name     = aws_ecr_repository.ecr_repo.name
     image_tag           = local.image_tag
 
+    # Extra permissions
+    extra_permissions   = var.extra_permissions
+
     # environment_variables 
     aws_region          = var.aws_region          
     aws_account_id      = var.aws_account_id
@@ -26,6 +29,7 @@ module "build" {
     artifact_type       = var.artifact_type
     source_type         = var.source_type
     source_location     = var.source_location
+    git_clone_depth     = var.git_clone_depth
     
     # Branch name
     source_version      = var.source_version != "" ?  var.source_version : null
