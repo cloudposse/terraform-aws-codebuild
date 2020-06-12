@@ -234,7 +234,6 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
-    git_clone_depth     = var.source_git_clone_depth
   }
 
   dynamic "vpc_config" {
