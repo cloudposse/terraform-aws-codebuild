@@ -166,3 +166,21 @@ variable "report_build_status" {
   default     = false
   description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB"
 }
+
+variable "vpc_id" {
+  type        = string
+  default     = ""
+  description = "The VPC ID to use to setup a VPC configuration"
+}
+
+variable "vpc_subnet_ids" {
+  type        = list(string)
+  default     = []
+  description = "VPC subnets that AWS Codebuild should use"
+}
+
+variable "vpc_security_group_ids" {
+  type        = list(string)
+  default     = []
+  description = "VPC security groups that AWS Codebuild should use to work with your VPC"
+}

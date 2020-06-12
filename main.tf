@@ -69,6 +69,8 @@ locals {
 
   # Final Map Selected from above
   cache = local.cache_def[var.cache_enabled ? "true" : "false"]
+
+  vpc_enabled = var.enabled && var.vpc_id
 }
 
 resource "aws_iam_role" "default" {
@@ -232,7 +234,17 @@ resource "aws_codebuild_project" "default" {
     type                = var.source_type
     location            = var.source_location
     report_build_status = var.report_build_status
-    git_clone_depth = var.source_git_clone_depth
+    git_clone_depth     = var.source_git_clone_depth
+  }
+
+  dynamic "vpc_config" {
+    for_each = local.vpc_enabled ? [1] : []
+
+    content {
+      security_group_ids = var.vpc_security_group_ids
+      subnets            = var.vpc_subnet_ids
+      vpc_id             = var.vpc_id
+    }
   }
 
   tags = module.label.tags
