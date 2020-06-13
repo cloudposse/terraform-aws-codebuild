@@ -42,7 +42,7 @@
 
 [![Cloud Posse][logo]](https://cpco.io/homepage)
 
-# terraform-aws-codebuild [![Codefresh Build Status](https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-codebuild?type=cf-1)](https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d198705e38a0429d812f7e4) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+# terraform-aws-codebuild [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 
 
 Terraform module to create AWS CodeBuild project for AWS CodePipeline.
