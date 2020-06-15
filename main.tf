@@ -195,7 +195,7 @@ resource "aws_codebuild_project" "default" {
   environment {
     compute_type    = var.build_compute_type
     image           = var.build_image
-    type            = var.build_environment_type
+    type            = var.build_type
     privileged_mode = var.privileged_mode
 
     environment_variable {
