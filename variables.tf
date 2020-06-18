@@ -78,15 +78,15 @@ variable "build_compute_type" {
   description = "Instance type of the build instance"
 }
 
-variable "build_environment_type" {
-  type        = string
-  default     = "LINUX_CONTAINER"
-  description = "The type of build environment to use for related builds. Available values are: LINUX_CONTAINER, LINUX_GPU_CONTAINER, WINDOWS_CONTAINER or ARM_CONTAINER."
-}
-
 variable "build_timeout" {
   default     = 60
   description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
+}
+
+variable "build_type" {
+  type        = string
+  default     = "LINUX_CONTAINER"
+  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
 }
 
 variable "buildspec" {
