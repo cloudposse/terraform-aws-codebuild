@@ -1,84 +1,51 @@
----
-#
-# This is the canonical configuration for the `README.md`
-# Run `make readme` to rebuild the `README.md`
-#
-
-# Name of this project
 name: terraform-aws-codebuild
-
-# Tags of this project
 tags:
-  - aws
-  - terraform
-  - terraform-modules
-  - cicd
-  - codepipeline
-  - codebuild
-  - continuous-integration
-  - continuous-delivery
-
-# Categories of this project
+- aws
+- terraform
+- terraform-modules
+- cicd
+- codepipeline
+- codebuild
+- continuous-integration
+- continuous-delivery
 categories:
-  - terraform-modules/cicd
-
-# Logo for this project
-#logo: docs/logo.png
-
-# License of this project
-license: "APACHE2"
-
-# Canonical GitHub repo
+- terraform-modules/cicd
+license: APACHE2
 github_repo: cloudposse/terraform-aws-codebuild
-
-# Badges to display
 badges:
-  - name: "Codefresh Build Status"
-    image: "https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-codebuild?type=cf-1"
-    url: "https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d198705e38a0429d812f7e4"
-  - name: "Latest Release"
-    image: "https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg"
-    url: "https://github.com/cloudposse/terraform-aws-codebuild/releases"
-  - name: "Slack Community"
-    image: "https://slack.cloudposse.com/badge.svg"
-    url: "https://slack.cloudposse.com"
-
+- name: Latest Release
+  image: https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg
+  url: https://github.com/cloudposse/terraform-aws-codebuild/releases
+- name: Slack Community
+  image: https://slack.cloudposse.com/badge.svg
+  url: https://slack.cloudposse.com
 related:
-  - name: "terraform-aws-ecs-codepipeline"
-    description: "Terraform Module for CI/CD with AWS Code Pipeline and Code Build for ECS"
-    url: "https://github.com/cloudposse/terraform-aws-ecs-codepipeline"
-
-# Short description of this project
-description: |-
-  Terraform module to create AWS CodeBuild project for AWS CodePipeline.
-
-# How to use this project
+- name: terraform-aws-ecs-codepipeline
+  description: Terraform Module for CI/CD with AWS Code Pipeline and Code Build for
+    ECS
+  url: https://github.com/cloudposse/terraform-aws-ecs-codepipeline
+description: Terraform module to create AWS CodeBuild project for AWS CodePipeline.
 usage: |-
   Include this module in your existing terraform code:
-
   ```hcl
   module "build" {
       source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
       namespace           = "eg"
       stage               = "staging"
       name                = "app"
-
       # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
       build_image         = "aws/codebuild/standard:2.0"
       build_compute_type  = "BUILD_GENERAL1_SMALL"
       build_timeout       = 60
-
       # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
       # For more info:
       # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
       # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
-
       privileged_mode     = true
       aws_region          = "us-east-1"
       aws_account_id      = "xxxxxxxxxx"
       image_repo_name     = "ecr-repo-name"
       image_tag           = "latest"
-
       # Optional extra environment variables
       environment_variables = [{
           name  = "JENKINS_URL"
@@ -91,17 +58,12 @@ usage: |-
         {
           name = "TIME_ZONE"
           value = "Pacific/Auckland"
-
         }]
   }
   ```
-
-# Other files to include in this README from the project folder
 include:
-  - "docs/targets.md"
-  - "docs/terraform.md"
-
-# Contributors to this project
+- docs/targets.md
+- docs/terraform.md
 contributors:
 - name: Erik Osterman
   github: osterman
