@@ -103,15 +103,15 @@ include:
 
 # Contributors to this project
 contributors:
-- name: "Erik Osterman"
-  github: "osterman"
-- name: "Igor Rodionov"
-  github: "goruha"
-- name: "Andriy Knysh"
-  github: "aknysh"
-- name: "Jamie Nelson"
-  github: "Jamie-BitfFlight"
-- name: "Sarkis Varozian"
-  github: "sarkis"
-- name: "Bircan Bilici"
-  github: "brcnblc"
+- name: Erik Osterman
+  github: osterman
+- name: Igor Rodionov
+  github: goruha
+- name: Andriy Knysh
+  github: aknysh
+- name: Jamie Nelson
+  github: Jamie-BitfFlight
+- name: Sarkis Varozian
+  github: sarkis
+- name: Bircan Bilici
+  github: brcnblc
