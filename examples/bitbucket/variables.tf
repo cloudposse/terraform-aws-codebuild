@@ -292,3 +292,9 @@ variable "extra_permissions" {
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
 }
+
+# Log tracker
+variable "log_tracker" {
+  type        = map
+  default     = {}
+}

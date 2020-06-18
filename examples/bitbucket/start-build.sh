@@ -97,7 +97,7 @@ arg=$4;if [[ $arg == "print-dots" || -z $arg ]];then dots=true;fi;
 
 declare -i init_timeout="${5:-60}"
 declare -i update_timeout="${6:-60}"
-declare -i sleep_interval="${7:-1}"
+declare -i sleep_interval="${7:-10}"
 declare -i init_wait_time="${8:-10}"
 declare -i max_log_retry="${9:-6}"
 
@@ -119,6 +119,8 @@ success_phrase="Phase complete: POST_BUILD State: SUCCEEDED"
 # Stream file to be created and evaluated by the script
 log_file="stream.log"
 
+# ---------------------------------------
+
 # Starting info
 echo Starting to build $project_name
 
@@ -126,17 +128,76 @@ echo Starting to build $project_name
 if [[ $aws_profile ]];then aws_profile_arg="--profile $aws_profile";fi
 if [[ $aws_region ]];then aws_region_arg="--region $aws_region";fi
 
+function getStatus(){
+  build_info=$(aws codebuild batch-get-builds --ids $build_id | jq .builds[0])
+
+  Phases=$(echo $build_info | jq .phases)
+  PhaseStatuses=$(echo $Phases | jq '.[] | {(.phaseType):(.phaseStatus)}' | jq -s add)
+
+  if [[ $(echo $PhaseStatuses | grep -p "\"COMPLETED\": null") != "" ]];then BatchCompleted=true;fi
+  if [[ $(echo $PhaseStatuses | grep -p "\"POST_BUILD\": \"SUCCEEDED\"") != "" ]];then BatchSucceeded=true;fi
+
+}
+
 # Run build command
-aws codebuild start-build --project-name $project_name $aws_profile_arg $aws_region_arg > build_out.json
+build_id=$(aws codebuild start-build --project-name $project_name $aws_profile_arg $aws_region_arg | jq .build.id | sed s/\"//g)
+echo build_id=$build_id
 
-# Show on screen
-cat build_out.json | jq .
+# Wait for Provisioning 
+set +e
+while true
+do
 
-# Extract build id
-build_id_raw=$(cat build_out.json | jq .build.id)
+# Get status
+getStatus
+echo $PhaseStatuses | jq .
 
-# Remove leading and ending double quotes
-build_id=$(echo $build_id_raw | sed "s/\"//g")
+ProvisioningPhase=$(echo $Phases | jq '.[] | select( .phaseType | contains("PROVISIONING"))' )
+ProvisioningStatus=$(echo $ProvisioningPhase | jq .phaseStatus | sed s/\"//g)
+
+echo ProvisioningStatus=$ProvisioningStatus
+
+if [[ $ProvisioningStatus == "SUCCEEDED" ]] 
+then
+  break
+fi
+
+if [[ $(echo $ProvisioningStatus | grep "ERROR") != "" || $BatchCompleted == true ]]
+then
+  statusCode=$(echo $ProvisioningPhase | jq .contexts[0].statusCode | sed s/\"//g)
+  errorMessage=$(echo $ProvisioningPhase | jq .contexts[0].message)
+  
+  # Try again if it gives "ACCESS_DENIED", in the very first deployment of build project
+  findInMessage=$(echo $errorMessage | grep "does not allow AWS CodeBuild to create Amazon CloudWatch Logs log streams for build")
+
+  if [[ $statusCode == "ACCESS_DENIED" &&  $findInMessage != "" && $retryCount < 2 ]] 
+  then
+    retryCount=$(($retryCount + 1))
+    echo Access Denied error.
+    echo Echo Retrying Build within 15 seconds...
+    echo Retry: $retryCount
+    echo "Waiting for 10 seconds"
+    sleep 15
+    # Run build command
+    build_id=$(aws codebuild start-build --project-name $project_name $aws_profile_arg $aws_region_arg | jq .build.id | sed s/\"//g)
+    echo new build id=$build_id
+    BatchCompleted=""
+  else
+    echo -e "${RED}Error: $statusCode${NC}"
+    echo -e "${RED}$errorMessage${NC}"
+    exit 1
+  fi
+    
+fi
+echo "Provisioning still continues, Waiting for 15 seconds and retrying..."
+sleep 15
+done
+set -e
+# End of provisioning
+
+# Extract Log Arn
+cloudWatchLogsArn=$(echo $build_info | jq .logs.cloudWatchLogsArn)
+echo cloudWatchLogsArn=$cloudWatchLogsArn
 
 # Extract group
 log_group=/aws/codebuild/$(echo $build_id | cut -d ":" -f 1)
@@ -160,22 +221,28 @@ do
   log_retry_count=$((log_retry_count+1))
   echo "Try count: $log_retry_count"
   echo "Checking log_group $log_group"
-  set +e
-  [ $(cw ls groups | grep "$log_group" ) ] && log_group_exists=true
-  if [[ ! -z $log_group_exists ]] && [[ ! -z $stream ]] && [[ ! -z $log_group ]]
+
+  # Check if Log group exists
+  if [[ $(cw ls groups | grep -p "$log_group$") != "" ]]
   then
-    echo "Log group exists."
+    log_group_exists=true
+    echo -e "${GREEN}Log group exists.${NC}"
     echo "Checking stream $stream"
-    [ $(cw ls streams $log_group | grep "$stream") ] && log_stream_exists=true
-   
+    if [[ $(cw ls streams $log_group | grep -p "$stream$") != "" ]]
+    then
+      echo -e "${GREEN}Log stream exists.${NC}"
+      log_stream_exists=true
+    else
+      echo -e "${RED}Log stream does not exist.${NC}"
+    fi
+  else
+    echo -e "${RED}Log group does not exist.${NC}"
   fi
-  set -e
+
   if [ $log_stream_exists ]
     then
-      echo Log Stream exists.
       break
     else
-      echo Log stream does not exit.
       if [ $log_retry_count -lt $max_log_retry ]
         then 
           echo "Wait for stream, trying in $init_wait_time seconds."
@@ -204,7 +271,7 @@ declare -i linesold=0
 declare -i elapsedtime=0
 logupdated=false
 
-echo "Waiting for first log update. (It usually takes about 40 seconds) "
+echo "Waiting for first log update. "
 
 while :
 do
@@ -246,7 +313,7 @@ do
 
   if [[ $logupdated == true ]]
     then
-      if [[ $elapsedtime -gt $update_timeout ]]; then echo;echo Update Timeout;echo Error: Build failed.;exit 1; fi
+      if [[ $elapsedtime -gt $update_timeout ]]; then echo;echo Log Update Timeout;echo Error: Build failed.;exit 1; fi
     else
       if [[ $elapsedtime -gt $init_timeout ]]; then echo;echo Init Timeout;echo Error: Build failed.;exit 1; fi
   fi
@@ -262,5 +329,19 @@ do
         fi 
   fi
 
+  # check job status
+  getStatus
+  echo 
+  if [[ $BatchCompleted == true && $BatchSucceeded != true ]]
+  then 
+    exitBatchCounter=$(($exitBatchCounter + 1))
+  fi  
+
+  if [[ $exitBatchCounter > 2 ]]
+  then
+    echo -e "${RED}Job Terminated Unexpectedly!${NC}"
+    echo $PhaseStatuses | jq .
+    exit 1
+  fi
 done
 
