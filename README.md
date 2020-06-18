@@ -42,7 +42,7 @@
 
 [![Cloud Posse][logo]](https://cpco.io/homepage)
 
-# terraform-aws-codebuild [![Codefresh Build Status](https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-codebuild?type=cf-1)](https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d198705e38a0429d812f7e4) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+# terraform-aws-codebuild [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-codebuild.svg)](https://github.com/cloudposse/terraform-aws-codebuild/releases) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 
 
 Terraform module to create AWS CodeBuild project for AWS CodePipeline.
@@ -87,30 +87,25 @@ Instead pin to the release tag (e.g. `?ref=tags/x.y.z`) of one of our [latest re
 
 
 Include this module in your existing terraform code:
-
 ```hcl
 module "build" {
     source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
     namespace           = "eg"
     stage               = "staging"
     name                = "app"
-
     # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
     build_image         = "aws/codebuild/standard:2.0"
     build_compute_type  = "BUILD_GENERAL1_SMALL"
     build_timeout       = 60
-
     # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
     # For more info:
     # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
     # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
-
     privileged_mode     = true
     aws_region          = "us-east-1"
     aws_account_id      = "xxxxxxxxxx"
     image_repo_name     = "ecr-repo-name"
     image_tag           = "latest"
-
     # Optional extra environment variables
     environment_variables = [{
         name  = "JENKINS_URL"
@@ -123,7 +118,6 @@ module "build" {
       {
         name = "TIME_ZONE"
         value = "Pacific/Auckland"
-
       }]
 }
 ```
