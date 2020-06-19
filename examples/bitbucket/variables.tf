@@ -1,3 +1,62 @@
+
+variable "aws_profile" {
+  type        = string
+  default     = ""
+  description = "(Optional) AWS Profile name as used in AWS credentials file."
+}
+
+# ECR Vars
+variable "repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
+  default     = ""
+}
+
+variable "image_tag_mutability" {
+  description = "The tag mutability setting for the repository.Must be one of MUTABLE or IMMUTABLE."
+  type        = string
+  default     = "MUTABLE"
+}
+
+variable "scan_on_push" {
+  description = "Indicates whether images are scanned after being pushed to the repository (true) or not scanned (false)."
+  type        = bool
+  default     = true
+}
+
+variable "life_cycle_policy" {
+  description = "Enables lifecycle policy"
+  type        = bool
+  default     = true
+}
+
+variable "keep_tagged_last_n_images" {
+  description = "Keeps only n number of images in the repository."
+  type        = number
+  default     = 30
+}
+
+variable "tagPrefixList" {
+  description = "Selection criteria for tagged images lifecycle policy."
+  type        = list(string)
+  default     = ["v"]
+}
+
+variable "expire_untagged_older_than_n_days" {
+  description = "Deletes untagged images older than n days."
+  type        = number
+  default     = 15
+}
+
+variable "run_build_token" {
+  description = "Change it to initiate run."
+  type        = string
+  default     = ""
+}
+
+
+# build vars
+
 variable "namespace" {
   type        = string
   default     = ""
@@ -8,11 +67,6 @@ variable "stage" {
   type        = string
   default     = ""
   description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-}
-
-variable "name" {
-  type        = string
-  description = "Solution name, e.g. 'app' or 'jenkins'"
 }
 
 variable "environment_variables" {
@@ -78,15 +132,15 @@ variable "build_compute_type" {
   description = "Instance type of the build instance"
 }
 
+variable "build_environment_type" {
+  type        = string
+  default     = "LINUX_CONTAINER"
+  description = "The type of build environment to use for related builds. Available values are: LINUX_CONTAINER, LINUX_GPU_CONTAINER, WINDOWS_CONTAINER or ARM_CONTAINER."
+}
+
 variable "build_timeout" {
   default     = 60
   description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
-}
-
-variable "build_type" {
-  type        = string
-  default     = "LINUX_CONTAINER"
-  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
 }
 
 variable "buildspec" {
@@ -173,19 +227,6 @@ variable "report_build_status" {
   description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB"
 }
 
-variable "vpc_id" {
-  type    = string
-  default = ""
-}
-
-variable "vpc_subnet_ids" {
-  type    = list
-  default = []
-}
-
-variable "vpc_security_group_ids" {
-  type    = list
-  default = []
 variable "git_clone_depth" {
   type        = number
   default     = null
@@ -228,58 +269,16 @@ variable "source_version" {
   description = "A version of the build input to be built for this project. If not specified, the latest version is used."
 }
 
-variable "logs_config" {
-  type        = any
-  default     = {}
-  description = "Configuration for the builds to store log data to CloudWatch or S3."
-}
-
-variable "extra_permissions" {
-  type        = list
-  default     = []
-  description = "List of action strings which will be added to IAM service account permissions."
-}
-
-variable "git_clone_depth" {
-  type        = number
-  default     = null
-  description = "Truncate git history to this many commits."
-}
-
-variable "private_repository" {
+variable "fetch_git_submodules" {
   type        = bool
   default     = false
-  description = "Set to true to login into private repository with credentials supplied in source_credential variable."
+  description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
 }
 
-variable "source_credential_auth_type" {
-  type        = string
-  default     = "PERSONAL_ACCESS_TOKEN"
-  description = "The type of authentication used to connect to a GitHub, GitHub Enterprise, or Bitbucket repository."
-}
-
-variable "source_credential_server_type" {
-  type        = string
-  default     = "GITHUB"
-  description = "The source provider used for this project."
-}
-
-variable "source_credential_token" {
-  type        = string
-  default     = ""
-  description = "For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password."
-}
-
-variable "source_credential_user_name" {
-  type        = string
-  default     = ""
-  description = "The Bitbucket username when the authType is BASIC_AUTH. This parameter is not valid for other types of source providers or connections."
-}
-
-variable "source_version" {
-  type        = string
-  default     = ""
-  description = "A version of the build input to be built for this project. If not specified, the latest version is used."
+variable "vpc_config" {
+  type        = any
+  default     = {}
+  description = "Configuration for the builds to run inside a VPC."
 }
 
 variable "logs_config" {
@@ -292,4 +291,10 @@ variable "extra_permissions" {
   type        = list
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
+}
+
+# Log tracker
+variable "log_tracker" {
+  type        = map
+  default     = {}
 }
