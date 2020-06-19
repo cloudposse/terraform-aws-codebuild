@@ -1,3 +1,62 @@
+
+variable "aws_profile" {
+  type        = string
+  default     = ""
+  description = "(Optional) AWS Profile name as used in AWS credentials file."
+}
+
+# ECR Vars
+variable "repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
+  default     = ""
+}
+
+variable "image_tag_mutability" {
+  description = "The tag mutability setting for the repository.Must be one of MUTABLE or IMMUTABLE."
+  type        = string
+  default     = "MUTABLE"
+}
+
+variable "scan_on_push" {
+  description = "Indicates whether images are scanned after being pushed to the repository (true) or not scanned (false)."
+  type        = bool
+  default     = true
+}
+
+variable "life_cycle_policy" {
+  description = "Enables lifecycle policy"
+  type        = bool
+  default     = true
+}
+
+variable "keep_tagged_last_n_images" {
+  description = "Keeps only n number of images in the repository."
+  type        = number
+  default     = 30
+}
+
+variable "tagPrefixList" {
+  description = "Selection criteria for tagged images lifecycle policy."
+  type        = list(string)
+  default     = ["v"]
+}
+
+variable "expire_untagged_older_than_n_days" {
+  description = "Deletes untagged images older than n days."
+  type        = number
+  default     = 15
+}
+
+variable "run_build_token" {
+  description = "Change it to initiate run."
+  type        = string
+  default     = ""
+}
+
+
+# build vars
+
 variable "namespace" {
   type        = string
   default     = ""
@@ -8,11 +67,6 @@ variable "stage" {
   type        = string
   default     = ""
   description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-}
-
-variable "name" {
-  type        = string
-  description = "Solution name, e.g. 'app' or 'jenkins'"
 }
 
 variable "environment_variables" {
@@ -78,15 +132,15 @@ variable "build_compute_type" {
   description = "Instance type of the build instance"
 }
 
+variable "build_environment_type" {
+  type        = string
+  default     = "LINUX_CONTAINER"
+  description = "The type of build environment to use for related builds. Available values are: LINUX_CONTAINER, LINUX_GPU_CONTAINER, WINDOWS_CONTAINER or ARM_CONTAINER."
+}
+
 variable "build_timeout" {
   default     = 60
   description = "How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed"
-}
-
-variable "build_type" {
-  type        = string
-  default     = "LINUX_CONTAINER"
-  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
 }
 
 variable "buildspec" {
@@ -237,4 +291,10 @@ variable "extra_permissions" {
   type        = list
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
+}
+
+# Log tracker
+variable "log_tracker" {
+  type        = map
+  default     = {}
 }
