@@ -187,3 +187,69 @@ variable "vpc_security_group_ids" {
   type    = list
   default = []
 }
+
+variable "git_clone_depth" {
+  type        = number
+  default     = null
+  description = "Truncate git history to this many commits."
+}
+
+variable "private_repository" {
+  type        = bool
+  default     = false
+  description = "Set to true to login into private repository with credentials supplied in source_credential variable."
+}
+
+variable "source_credential_auth_type" {
+  type        = string
+  default     = "PERSONAL_ACCESS_TOKEN"
+  description = "The type of authentication used to connect to a GitHub, GitHub Enterprise, or Bitbucket repository."
+}
+
+variable "source_credential_server_type" {
+  type        = string
+  default     = "GITHUB"
+  description = "The source provider used for this project."
+}
+
+variable "source_credential_token" {
+  type        = string
+  default     = ""
+  description = "For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password."
+}
+
+variable "source_credential_user_name" {
+  type        = string
+  default     = ""
+  description = "The Bitbucket username when the authType is BASIC_AUTH. This parameter is not valid for other types of source providers or connections."
+}
+
+variable "source_version" {
+  type        = string
+  default     = ""
+  description = "A version of the build input to be built for this project. If not specified, the latest version is used."
+}
+
+variable "fetch_git_submodules" {
+  type        = bool
+  default     = false
+  description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
+}
+
+variable "vpc_config" {
+  type        = any
+  default     = {}
+  description = "Configuration for the builds to run inside a VPC."
+}
+
+variable "logs_config" {
+  type        = any
+  default     = {}
+  description = "Configuration for the builds to store log data to CloudWatch or S3."
+}
+
+variable "extra_permissions" {
+  type        = list
+  default     = []
+  description = "List of action strings which will be added to IAM service account permissions."
+}

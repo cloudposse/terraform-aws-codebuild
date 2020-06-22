@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "permissions" {
   statement {
     sid = ""
 
-    actions = [
+    actions = compact(concat([
       "codecommit:GitPull",
       "ecr:BatchCheckLayerAvailability",
       "ecr:CompleteLayerUpload",
@@ -133,8 +133,9 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "ssm:GetParameters",
-      "ec2:*"
-    ]
+      "ec2:*",
+      "secretsmanager:GetSecretValue"
+    ], var.extra_permissions))
 
     effect = "Allow"
 
@@ -247,4 +248,28 @@ resource "aws_codebuild_project" "default" {
   }
 
   tags = module.label.tags
+
+  dynamic "logs_config" {
+    for_each = length(var.logs_config) > 0 ? [""] : []
+    content {
+      dynamic "cloudwatch_logs" {
+        for_each = contains(keys(var.logs_config), "cloudwatch_logs") ? { key = var.logs_config["cloudwatch_logs"] } : {}
+        content {
+          status      = lookup(cloudwatch_logs.value, "status", null)
+          group_name  = lookup(cloudwatch_logs.value, "group_name", null)
+          stream_name = lookup(cloudwatch_logs.value, "stream_name", null)
+        }
+      }
+
+      dynamic "s3_logs" {
+        for_each = contains(keys(var.logs_config), "s3_logs") ? { key = var.logs_config["s3_logs"] } : {}
+        content {
+          status              = lookup(s3_logs.value, "status", null)
+          location            = lookup(s3_logs.value, "location", null)
+          encryption_disabled = lookup(s3_logs.value, "encryption_disabled", null)
+        }
+      }
+    }
+  }
+
 }
