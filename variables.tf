@@ -173,23 +173,6 @@ variable "report_build_status" {
   description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB"
 }
 
-variable "vpc_id" {
-  type    = string
-  default = ""
-}
-
-variable "fetch_git_submodules" {
-  type        = bool
-  default     = false
-  description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
-}
-
-variable "vpc_config" {
-  type        = any
-  default     = {}
-  description = "Configuration for the builds to run inside a VPC."
-}
-
 variable "git_clone_depth" {
   type        = number
   default     = null
@@ -220,6 +203,12 @@ variable "source_credential_token" {
   description = "For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password."
 }
 
+variable "extra_permissions" {
+  type        = list
+  default     = []
+  description = "List of action strings which will be added to IAM service account permissions."
+}
+
 variable "source_credential_user_name" {
   type        = string
   default     = ""
@@ -238,8 +227,19 @@ variable "logs_config" {
   description = "Configuration for the builds to store log data to CloudWatch or S3."
 }
 
-variable "extra_permissions" {
-  type        = list
-  default     = []
-  description = "List of action strings which will be added to IAM service account permissions."
+variable "vpc_id" {
+  type    = string
+  default = ""
+}
+
+variable "fetch_git_submodules" {
+  type        = bool
+  default     = false
+  description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
+}
+
+variable "vpc_config" {
+  type        = any
+  default     = {}
+  description = "Configuration for the builds to run inside a VPC."
 }
