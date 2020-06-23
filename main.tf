@@ -124,6 +124,7 @@ data "aws_iam_policy_document" "permissions" {
 
     actions = compact(concat([
       "codecommit:GitPull",
+      "ec2:*",
       "ecr:BatchCheckLayerAvailability",
       "ecr:CompleteLayerUpload",
       "ecr:GetAuthorizationToken",
