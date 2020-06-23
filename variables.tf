@@ -203,12 +203,6 @@ variable "source_credential_token" {
   description = "For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password."
 }
 
-variable "extra_permissions" {
-  type        = list
-  default     = []
-  description = "List of action strings which will be added to IAM service account permissions."
-}
-
 variable "source_credential_user_name" {
   type        = string
   default     = ""
@@ -219,17 +213,6 @@ variable "source_version" {
   type        = string
   default     = ""
   description = "A version of the build input to be built for this project. If not specified, the latest version is used."
-}
-
-variable "logs_config" {
-  type        = any
-  default     = {}
-  description = "Configuration for the builds to store log data to CloudWatch or S3."
-}
-
-variable "vpc_id" {
-  type    = string
-  default = ""
 }
 
 variable "fetch_git_submodules" {
