@@ -328,35 +328,5 @@ resource "aws_codebuild_project" "default" {
       }
     }
   }
-
-  vpc_config {
-    vpc_id             = var.vpc_id
-    subnets            = var.vpc_subnet_ids
-    security_group_ids = var.vpc_security_group_ids
-  }
-
-  dynamic "logs_config" {
-    for_each = length(var.logs_config) > 0 ? [""] : []
-    content {
-      dynamic "cloudwatch_logs" {
-        for_each = contains(keys(var.logs_config), "cloudwatch_logs") ? { key = var.logs_config["cloudwatch_logs"] } : {}
-        content {
-          status      = lookup(cloudwatch_logs.value, "status", null)
-          group_name  = lookup(cloudwatch_logs.value, "group_name", null)
-          stream_name = lookup(cloudwatch_logs.value, "stream_name", null)
-        }
-      }
-
-      dynamic "s3_logs" {
-        for_each = contains(keys(var.logs_config), "s3_logs") ? { key = var.logs_config["s3_logs"] } : {}
-        content {
-          status              = lookup(s3_logs.value, "status", null)
-          location            = lookup(s3_logs.value, "location", null)
-          encryption_disabled = lookup(s3_logs.value, "encryption_disabled", null)
-        }
-      }
-    }
-  }
-
 }
 

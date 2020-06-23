@@ -35,15 +35,6 @@
 
 | Name | Description |
 |------|-------------|
-<<<<<<< Updated upstream
-| badge_url | The URL of the build badge when badge_enabled is enabled |
-| cache_bucket_arn | Cache S3 bucket ARN |
-| cache_bucket_name | Cache S3 bucket name |
-| project_id | Project ID |
-| project_name | Project name |
-| role_arn | IAM Role ARN |
-| role_id | IAM Role ID |
-=======
 | badge\_url | The URL of the build badge when badge\_enabled is enabled |
 | cache\_bucket\_arn | Cache S3 bucket ARN |
 | cache\_bucket\_name | Cache S3 bucket name |
@@ -52,4 +43,3 @@
 | role\_arn | IAM Role ARN |
 | role\_id | IAM Role ID |
 
->>>>>>> Stashed changes
