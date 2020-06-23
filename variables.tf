@@ -230,18 +230,6 @@ variable "source_version" {
   description = "A version of the build input to be built for this project. If not specified, the latest version is used."
 }
 
-variable "fetch_git_submodules" {
-  type        = bool
-  default     = false
-  description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
-}
-
-variable "vpc_config" {
-  type        = any
-  default     = {}
-  description = "Configuration for the builds to run inside a VPC."
-}
-
 variable "logs_config" {
   type        = any
   default     = {}
