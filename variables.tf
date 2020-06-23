@@ -226,3 +226,15 @@ variable "vpc_config" {
   default     = {}
   description = "Configuration for the builds to run inside a VPC."
 }
+
+variable "logs_config" {
+  type        = any
+  default     = {}
+  description = "Configuration for the builds to store log data to CloudWatch or S3."
+}
+
+variable "extra_permissions" {
+  type        = list
+  default     = []
+  description = "List of action strings which will be added to IAM service account permissions."
+}
