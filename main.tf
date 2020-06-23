@@ -138,7 +138,6 @@ data "aws_iam_policy_document" "permissions" {
       "ssm:GetParameters",
       "ec2:*",
       "secretsmanager:GetSecretValue",
-      "ec2:*",
     ], var.extra_permissions))
 
     effect = "Allow"
@@ -298,12 +297,6 @@ resource "aws_codebuild_project" "default" {
       subnets            = lookup(var.vpc_config, "subnets", null)
       security_group_ids = lookup(var.vpc_config, "security_group_ids", null)
     }
-  }
-
-  vpc_config {
-    vpc_id             = var.vpc_id
-    subnets            = var.vpc_subnet_ids
-    security_group_ids = var.vpc_security_group_ids
   }
 
   dynamic "logs_config" {

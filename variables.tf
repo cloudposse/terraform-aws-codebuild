@@ -178,16 +178,6 @@ variable "vpc_id" {
   default = ""
 }
 
-variable "vpc_subnet_ids" {
-  type    = list
-  default = []
-}
-
-variable "vpc_security_group_ids" {
-  type    = list
-  default = []
-}
-
 variable "fetch_git_submodules" {
   type        = bool
   default     = false
