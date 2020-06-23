@@ -140,7 +140,7 @@ data "aws_iam_policy_document" "permissions" {
       "secretsmanager:GetSecretValue",
       "ec2:*",
     ], var.extra_permissions))
-      
+
     effect = "Allow"
 
     resources = [
@@ -306,8 +306,6 @@ resource "aws_codebuild_project" "default" {
     security_group_ids = var.vpc_security_group_ids
   }
 
-  tags = module.label.tags
-
   dynamic "logs_config" {
     for_each = length(var.logs_config) > 0 ? [""] : []
     content {
@@ -336,8 +334,6 @@ resource "aws_codebuild_project" "default" {
     subnets            = var.vpc_subnet_ids
     security_group_ids = var.vpc_security_group_ids
   }
-
-  tags = module.label.tags
 
   dynamic "logs_config" {
     for_each = length(var.logs_config) > 0 ? [""] : []
