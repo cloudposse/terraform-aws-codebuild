@@ -130,6 +130,8 @@ data "aws_iam_policy_document" "permissions" {
       "ecr:InitiateLayerUpload",
       "ecr:PutImage",
       "ecr:UploadLayerPart",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
       "ecs:RunTask",
       "iam:PassRole",
       "logs:CreateLogGroup",
