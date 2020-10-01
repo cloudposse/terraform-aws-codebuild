@@ -125,12 +125,13 @@ Available targets:
 
 ```
 <!-- markdownlint-restore -->
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12.0 |
-| aws | ~> 2.0 |
+| aws | >= 2.0 |
 | local | ~> 1.2 |
 | null | ~> 2.0 |
 | random | ~> 2.1 |
@@ -140,7 +141,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| aws | ~> 2.0 |
+| aws | >= 2.0 |
 | random | ~> 2.1 |
 
 ## Inputs
@@ -199,6 +200,7 @@ Available targets:
 | role\_arn | IAM Role ARN |
 | role\_id | IAM Role ID |
 
+<!-- markdownlint-restore -->
 
 
 
