@@ -125,6 +125,7 @@ Available targets:
 
 ```
 <!-- markdownlint-restore -->
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -194,11 +195,13 @@ Available targets:
 | badge\_url | The URL of the build badge when badge\_enabled is enabled |
 | cache\_bucket\_arn | Cache S3 bucket ARN |
 | cache\_bucket\_name | Cache S3 bucket name |
+| project\_arn | Project ARN |
 | project\_id | Project ID |
 | project\_name | Project name |
 | role\_arn | IAM Role ARN |
 | role\_id | IAM Role ID |
 
+<!-- markdownlint-restore -->
 
 
 
