@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -72,3 +73,4 @@
 | role\_arn | IAM Role ARN |
 | role\_id | IAM Role ID |
 
+<!-- markdownlint-restore -->
