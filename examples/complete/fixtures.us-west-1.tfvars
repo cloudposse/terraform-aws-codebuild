@@ -6,8 +6,6 @@ stage = "test"
 
 name = "cedebuild-test"
 
-cache_enabled = true
-
 cache_bucket_suffix_enabled = false
 
 environment_variables = [
@@ -25,3 +23,7 @@ environment_variables = [
 
   }
 ]
+
+cache_expiration_days = 7
+
+cache_type = "S3"
