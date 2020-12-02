@@ -4,29 +4,19 @@ data "aws_caller_identity" "default" {
 data "aws_region" "default" {
 }
 
-module "label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.5.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  attributes = var.attributes
-  tags       = var.tags
-}
-
 resource "aws_s3_bucket" "cache_bucket" {
   count         = var.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
-  tags          = module.label.tags
+  tags          = module.this.tags
 
   lifecycle_rule {
     id      = "codebuildcache"
     enabled = true
 
     prefix = "/"
-    tags   = module.label.tags
+    tags   = module.this.tags
 
     expiration {
       days = var.cache_expiration_days
@@ -44,7 +34,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.label.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -80,7 +70,7 @@ locals {
 
 resource "aws_iam_role" "default" {
   count                 = var.enabled ? 1 : 0
-  name                  = module.label.id
+  name                  = module.this.id
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
 }
@@ -104,7 +94,7 @@ data "aws_iam_policy_document" "role" {
 
 resource "aws_iam_policy" "default" {
   count  = var.enabled ? 1 : 0
-  name   = module.label.id
+  name   = module.this.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.permissions.json
 }
@@ -113,7 +103,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
   count = var.enabled && local.s3_cache_enabled ? 1 : 0
 
 
-  name   = "${module.label.id}-cache-bucket"
+  name   = "${module.this.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
@@ -187,13 +177,13 @@ resource "aws_codebuild_source_credential" "authorization" {
 
 resource "aws_codebuild_project" "default" {
   count          = var.enabled ? 1 : 0
-  name           = module.label.id
+  name           = module.this.id
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
   source_version = var.source_version != "" ? var.source_version : null
   tags = {
-    for name, value in module.label.tags :
+    for name, value in module.this.tags :
     name => value
     if length(value) > 0
   }
