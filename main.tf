@@ -5,7 +5,7 @@ data "aws_region" "default" {
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
-  count         = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 }
 
 resource "random_string" "bucket_prefix" {
-  count   = var.enabled ? 1 : 0
+  count   = module.this.enabled ? 1 : 0
   length  = 12
   number  = false
   upper   = false
@@ -52,7 +52,7 @@ locals {
   cache_options = {
     "S3" = {
       type     = "S3"
-      location = var.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
+      location = module.this.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
 
     },
     "LOCAL" = {
@@ -69,7 +69,7 @@ locals {
 }
 
 resource "aws_iam_role" "default" {
-  count                 = var.enabled ? 1 : 0
+  count                 = module.this.enabled ? 1 : 0
   name                  = module.this.id
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
@@ -93,14 +93,14 @@ data "aws_iam_policy_document" "role" {
 }
 
 resource "aws_iam_policy" "default" {
-  count  = var.enabled ? 1 : 0
+  count  = module.this.enabled ? 1 : 0
   name   = module.this.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.permissions.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
-  count = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
 
   name   = "${module.this.id}-cache-bucket"
@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   statement {
     sid = ""
 
@@ -156,19 +156,19 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  count      = var.enabled ? 1 : 0
+  count      = module.this.enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
-  count      = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_codebuild_source_credential" "authorization" {
-  count       = var.enabled && var.private_repository ? 1 : 0
+  count       = module.this.enabled && var.private_repository ? 1 : 0
   auth_type   = var.source_credential_auth_type
   server_type = var.source_credential_server_type
   token       = var.source_credential_token
@@ -176,7 +176,7 @@ resource "aws_codebuild_source_credential" "authorization" {
 }
 
 resource "aws_codebuild_project" "default" {
-  count          = var.enabled ? 1 : 0
+  count          = module.this.enabled ? 1 : 0
   name           = module.this.id
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
