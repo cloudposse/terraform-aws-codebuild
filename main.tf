@@ -4,29 +4,19 @@ data "aws_caller_identity" "default" {
 data "aws_region" "default" {
 }
 
-module "label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.5.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  attributes = var.attributes
-  tags       = var.tags
-}
-
 resource "aws_s3_bucket" "cache_bucket" {
-  count         = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
-  tags          = module.label.tags
+  tags          = module.this.tags
 
   lifecycle_rule {
     id      = "codebuildcache"
     enabled = true
 
     prefix = "/"
-    tags   = module.label.tags
+    tags   = module.this.tags
 
     expiration {
       days = var.cache_expiration_days
@@ -35,7 +25,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 }
 
 resource "random_string" "bucket_prefix" {
-  count   = var.enabled ? 1 : 0
+  count   = module.this.enabled ? 1 : 0
   length  = 12
   number  = false
   upper   = false
@@ -44,7 +34,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.label.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -62,7 +52,7 @@ locals {
   cache_options = {
     "S3" = {
       type     = "S3"
-      location = var.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
+      location = module.this.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
 
     },
     "LOCAL" = {
@@ -79,8 +69,8 @@ locals {
 }
 
 resource "aws_iam_role" "default" {
-  count                 = var.enabled ? 1 : 0
-  name                  = module.label.id
+  count                 = module.this.enabled ? 1 : 0
+  name                  = module.this.id
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
 }
@@ -103,17 +93,17 @@ data "aws_iam_policy_document" "role" {
 }
 
 resource "aws_iam_policy" "default" {
-  count  = var.enabled ? 1 : 0
-  name   = module.label.id
+  count  = module.this.enabled ? 1 : 0
+  name   = module.this.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.permissions.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
-  count = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
 
-  name   = "${module.label.id}-cache-bucket"
+  name   = "${module.this.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
@@ -148,7 +138,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   statement {
     sid = ""
 
@@ -166,19 +156,19 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  count      = var.enabled ? 1 : 0
+  count      = module.this.enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
-  count      = var.enabled && local.s3_cache_enabled ? 1 : 0
+  count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_codebuild_source_credential" "authorization" {
-  count       = var.enabled && var.private_repository ? 1 : 0
+  count       = module.this.enabled && var.private_repository ? 1 : 0
   auth_type   = var.source_credential_auth_type
   server_type = var.source_credential_server_type
   token       = var.source_credential_token
@@ -186,14 +176,14 @@ resource "aws_codebuild_source_credential" "authorization" {
 }
 
 resource "aws_codebuild_project" "default" {
-  count          = var.enabled ? 1 : 0
-  name           = module.label.id
+  count          = module.this.enabled ? 1 : 0
+  name           = module.this.id
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
   source_version = var.source_version != "" ? var.source_version : null
   tags = {
-    for name, value in module.label.tags :
+    for name, value in module.this.tags :
     name => value
     if length(value) > 0
   }
@@ -241,10 +231,10 @@ resource "aws_codebuild_project" "default" {
     }
 
     dynamic "environment_variable" {
-      for_each = signum(length(var.stage)) == 1 ? [""] : []
+      for_each = signum(length(module.this.stage)) == 1 ? [""] : []
       content {
         name  = "STAGE"
-        value = var.stage
+        value = module.this.stage
       }
     }
 

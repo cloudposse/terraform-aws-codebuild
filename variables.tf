@@ -1,20 +1,3 @@
-variable "namespace" {
-  type        = string
-  default     = ""
-  description = "Namespace, which could be your organization name, e.g. 'eg' or 'cp'"
-}
-
-variable "stage" {
-  type        = string
-  default     = ""
-  description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-}
-
-variable "name" {
-  type        = string
-  description = "Solution name, e.g. 'app' or 'jenkins'"
-}
-
 variable "environment_variables" {
   type = list(object(
     {
@@ -29,12 +12,6 @@ variable "environment_variables" {
   }]
 
   description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build"
-}
-
-variable "enabled" {
-  type        = bool
-  default     = true
-  description = "A boolean to enable/disable resource creation"
 }
 
 variable "cache_expiration_days" {
@@ -93,24 +70,6 @@ variable "buildspec" {
   type        = string
   default     = ""
   description = "Optional buildspec declaration to use for building the project"
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `name`, `namespace`, `stage`, etc."
-}
-
-variable "attributes" {
-  type        = list(string)
-  default     = []
-  description = "Additional attributes (e.g. `policy` or `role`)"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit', 'XYZ')`"
 }
 
 variable "privileged_mode" {
