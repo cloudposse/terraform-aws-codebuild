@@ -189,7 +189,8 @@ resource "aws_codebuild_project" "default" {
   }
 
   artifacts {
-    type = var.artifact_type
+    type     = var.artifact_type
+    location = var.artifact_location
   }
 
   cache {
