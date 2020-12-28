@@ -192,6 +192,23 @@ variable "vpc_config" {
   description = "Configuration for the builds to run inside a VPC."
 }
 
+variable "secondary_sources" {
+  type = list(object(
+  {
+    git_clone_depth = number
+    location = string
+    source_identifier = string
+    type = string
+    fetch_submodules = bool
+    insecure_ssl = bool
+    report_build_status = bool
+  }))
+
+  default = []
+
+}
+
+
 variable "logs_config" {
   type        = any
   default     = {}

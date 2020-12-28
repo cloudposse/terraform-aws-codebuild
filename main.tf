@@ -280,6 +280,22 @@ resource "aws_codebuild_project" "default" {
     }
   }
 
+  dynamic "secondary_sources"{
+        for_each = length(var.secondary_sources) > 0? [{}] : []
+        content {
+          git_clone_depth = lookup(var.secondary_sources[count.index], "git_clone_depth", null)
+          location = lookup(var.secondary_sources[count.index], "location", null)
+          source_identifier = lookup(var.secondary_sources[count.index], "source_identifier", null)
+          type = lookup(var.secondary_sources[count.index], "type", "GITHUB")
+          insecure_ssl = lookup(var.secondary_sources[count.index], "insecure_ssl", false)
+          report_build_status =  lookup(var.secondary_sources[count.index], "report_build_status", false)
+
+          git_submodules_config {
+            fetch_submodules = lookup(var.secondary_sources[count.index], "fetch_submodules", false)
+          }
+        }
+      }
+
   dynamic "vpc_config" {
     for_each = length(var.vpc_config) > 0 ? [""] : []
     content {
