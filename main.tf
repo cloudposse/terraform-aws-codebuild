@@ -281,20 +281,21 @@ resource "aws_codebuild_project" "default" {
   }
 
   dynamic "secondary_sources"{
-        for_each = length(var.secondary_sources) > 0? [{}] : []
-        content {
-          git_clone_depth = lookup(var.secondary_sources[count.index], "git_clone_depth", null)
-          location = lookup(var.secondary_sources[count.index], "location", null)
-          source_identifier = lookup(var.secondary_sources[count.index], "source_identifier", null)
-          type = lookup(var.secondary_sources[count.index], "type", "GITHUB")
-          insecure_ssl = lookup(var.secondary_sources[count.index], "insecure_ssl", false)
-          report_build_status =  lookup(var.secondary_sources[count.index], "report_build_status", false)
+      iterator = secondary_source
+      for_each = length(var.secondary_sources) > 0 ? var.secondary_sources : []
+      content {
+        git_clone_depth = secondary_source.value.git_clone_depth
+        location = secondary_source.value.location
+        source_identifier = secondary_source.value.source_identifier
+        type = secondary_source.value.type
+        insecure_ssl = secondary_source.value.insecure_ssl
+        report_build_status =  secondary_source.value.report_build_status
 
-          git_submodules_config {
-            fetch_submodules = lookup(var.secondary_sources[count.index], "fetch_submodules", false)
-          }
+        git_submodules_config {
+          fetch_submodules = secondary_source.value.fetch_submodules
         }
       }
+  }
 
   dynamic "vpc_config" {
     for_each = length(var.vpc_config) > 0 ? [""] : []
