@@ -41,7 +41,7 @@
 | enabled | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
 | environment\_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
-| secondary\_sources | A list of maps, that contain secondary repository parameters for the build | <pre>list(object(<br>    {<br>      git_clone_depth  = number<br>location = string<br>git_submodules_config = bool<br>source_identifier = string<br>type = string<br>fetch_submodules = bool<br>insecure_ssl = string<br>report_build_status = string<br>  }))</pre> | <pre>""</pre> | no |
+| secondary\_sources | A list of maps, that contain secondary repository parameters for the build | <pre>list(object(<br>    {<br>      git_clone_depth  = number<br>.     location = string<br>source_identifier = string<br>.     type = string<br>fetch_submodules = bool<br>.     insecure_ssl = string<br>.     report_build_status = string<br>  }))</pre> | <pre>""</pre> | no |
 | extra\_permissions | List of action strings which will be added to IAM service account permissions. | `list` | `[]` | no |
 | fetch\_git\_submodules | If set to true, fetches Git submodules for the AWS CodeBuild build project. | `bool` | `false` | no |
 | git\_clone\_depth | Truncate git history to this many commits. | `number` | `null` | no |
