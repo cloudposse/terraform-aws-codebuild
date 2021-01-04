@@ -79,7 +79,9 @@ Include this module in your existing terraform code:
 
 ```hcl
 module "build" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-codebuild.git?ref=master"
+    source = "cloudposse/codebuild/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
     namespace           = "eg"
     stage               = "staging"
     name                = "app"
@@ -139,7 +141,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.0 |
+| terraform | >= 0.12.26 |
 | aws | >= 2.0 |
 | local | >= 1.2 |
 | null | >= 2.0 |
@@ -307,7 +309,7 @@ In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
 
 ## Copyright
 
-Copyright © 2017-2020 [Cloud Posse, LLC](https://cpco.io/copyright)
+Copyright © 2017-2021 [Cloud Posse, LLC](https://cpco.io/copyright)
 
 
 
