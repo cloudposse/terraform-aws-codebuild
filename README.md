@@ -61,6 +61,25 @@ We literally have [*hundreds of terraform modules*][terraform_modules] that are 
 
 
 
+## Security & Compliance [<img src="https://cloudposse.com/wp-content/uploads/2020/11/bridgecrew.svg" width="250" align="right" />](https://bridgecrew.io/)
+
+Security scanning is graciously provided by Bridgecrew. Bridgecrew is the leading fully hosted, cloud-native solution providing continuous Terraform security and compliance.
+
+| Benchmark | Description |
+|--------|---------------|
+| [![Infrastructure Security](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/general)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=INFRASTRUCTURE+SECURITY) | Infrastructure Security Compliance |
+| [![CIS KUBERNETES](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/cis_kubernetes)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=CIS+KUBERNETES+V1.5) | Center for Internet Security, KUBERNETES Compliance |
+| [![CIS AWS](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/cis_aws)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=CIS+AWS+V1.2) | Center for Internet Security, AWS Compliance |
+| [![CIS AZURE](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/cis_azure)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=CIS+AZURE+V1.1) | Center for Internet Security, AZURE Compliance |
+| [![PCI-DSS](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/pci)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=PCI-DSS+V3.2) | Payment Card Industry Data Security Standards Compliance |
+| [![NIST-800-53](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/nist)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=NIST-800-53) | National Institute of Standards and Technology Compliance |
+| [![ISO27001](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/iso)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=ISO27001) | Information Security Management System, ISO/IEC 27001 Compliance |
+| [![SOC2](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/soc2)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=SOC2)| Service Organization Control 2 Compliance |
+| [![CIS GCP](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/cis_gcp)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=CIS+GCP+V1.1) | Center for Internet Security, GCP Compliance |
+| [![HIPAA](https://www.bridgecrew.cloud/badges/github/cloudposse/terraform-aws-codebuild/hipaa)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=cloudposse%2Fterraform-aws-codebuild&benchmark=HIPAA) | Health Insurance Portability and Accountability Compliance |
+
+
+
 ## Usage
 
 
@@ -177,6 +196,7 @@ Available targets:
 | context | Single object for setting entire context at once.<br>See description of individual variables for details.<br>Leave string and numeric variables as `null` to use default value.<br>Individual variable settings (non-null) override settings in context object,<br>except for attributes, tags, and additional\_tag\_map, which are merged. | <pre>object({<br>    enabled             = bool<br>    namespace           = string<br>    environment         = string<br>    stage               = string<br>    name                = string<br>    delimiter           = string<br>    attributes          = list(string)<br>    tags                = map(string)<br>    additional_tag_map  = map(string)<br>    regex_replace_chars = string<br>    label_order         = list(string)<br>    id_length_limit     = number<br>  })</pre> | <pre>{<br>  "additional_tag_map": {},<br>  "attributes": [],<br>  "delimiter": null,<br>  "enabled": true,<br>  "environment": null,<br>  "id_length_limit": null,<br>  "label_order": [],<br>  "name": null,<br>  "namespace": null,<br>  "regex_replace_chars": null,<br>  "stage": null,<br>  "tags": {}<br>}</pre> | no |
 | delimiter | Delimiter to be used between `namespace`, `environment`, `stage`, `name` and `attributes`.<br>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
 | enabled | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
+| encryption\_enabled | When set to 'true' the resource will have AES256 encryption enabled by default | `bool` | `false` | no |
 | environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
 | environment\_variables | A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
 | extra\_permissions | List of action strings which will be added to IAM service account permissions. | `list` | `[]` | no |

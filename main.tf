@@ -22,6 +22,18 @@ resource "aws_s3_bucket" "cache_bucket" {
       days = var.cache_expiration_days
     }
   }
+
+  dynamic "server_side_encryption_configuration" {
+    for_each = var.encryption_enabled ? ["true"] : []
+
+    content {
+      rule {
+        apply_server_side_encryption_by_default {
+          sse_algorithm = "AES256"
+        }
+      }
+    }
+  }
 }
 
 resource "random_string" "bucket_prefix" {
