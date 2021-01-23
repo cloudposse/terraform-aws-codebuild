@@ -199,7 +199,13 @@ variable "logs_config" {
 }
 
 variable "extra_permissions" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
+}
+
+variable "encryption_enabled" {
+  type        = bool
+  default     = false
+  description = "When set to 'true' the resource will have AES256 encryption enabled by default"
 }
