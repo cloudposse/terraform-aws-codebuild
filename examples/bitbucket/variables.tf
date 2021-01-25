@@ -15,7 +15,7 @@ variable "repository_name" {
 variable "image_tag_mutability" {
   description = "The tag mutability setting for the repository.Must be one of MUTABLE or IMMUTABLE."
   type        = string
-  default     = "MUTABLE"
+  default     = "IMMUTABLE"
 }
 
 variable "scan_on_push" {
