@@ -43,7 +43,7 @@ output "repository_arn" {
 
 output "repository_image_full_name_tag" {
   # The full name of the container image as docker style "name:tag".
-  value =  "${aws_ecr_repository.ecr_repo.repository_url}:${local.image_tag}"
+  value = "${aws_ecr_repository.ecr_repo.repository_url}:${local.image_tag}"
 
 }
 

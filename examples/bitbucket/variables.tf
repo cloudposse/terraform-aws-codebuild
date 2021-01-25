@@ -295,6 +295,6 @@ variable "extra_permissions" {
 
 # Log tracker
 variable "log_tracker" {
-  type        = map
-  default     = {}
+  type    = map
+  default = {}
 }
