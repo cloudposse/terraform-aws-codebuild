@@ -1,35 +1,35 @@
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
   profile = var.aws_profile
 }
 
 
 locals {
-repository_name = var.repository_name
+  repository_name = var.repository_name
   build_name      = local.repository_name
   image_tag       = var.image_tag
   tagPrefixList   = concat(var.tagPrefixList, ["ts"])
   log_tracker_defaults = {
-    initial_timeout   = 180
-    update_timeout    = 300
-    sleep_interval    = 30
-    init_wait_time    = 15
-    max_retry_count   = 4
-    print_dots        = false
+    initial_timeout = 180
+    update_timeout  = 300
+    sleep_interval  = 30
+    init_wait_time  = 15
+    max_retry_count = 4
+    print_dots      = false
   }
   log_tracker = merge(local.log_tracker_defaults, var.log_tracker)
 }
 
 
 resource "null_resource" "codebuild_provisioner" {
-    triggers = {
-      value = timestamp()
-    }
-  
+  triggers = {
+    value = timestamp()
+  }
+
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command = join(" ",[
+    command = join(" ", [
       "./start-build.sh",
       module.build.project_name,
       var.aws_profile,
