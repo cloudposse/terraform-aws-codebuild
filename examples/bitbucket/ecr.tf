@@ -5,7 +5,7 @@ resource "aws_ecr_repository" "ecr_repo" {
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
-  
+
   tags = ["example"]
 }
 
