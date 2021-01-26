@@ -5,11 +5,26 @@ data "aws_region" "default" {
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
+  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
+  #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
   tags          = module.this.tags
+
+  versioning {
+    enabled    = var.versioning_enabled
+    mfa_delete = var.mfa_delete
+  }
+
+  dynamic "logging" {
+    for_each = var.access_log_bucket_name != "" ? [1] : []
+    content {
+      target_bucket = var.access_log_bucket_name
+      target_prefix = "logs/${module.this.id}/"
+    }
+  }
 
   lifecycle_rule {
     id      = "codebuildcache"
@@ -85,6 +100,7 @@ resource "aws_iam_role" "default" {
   name                  = module.this.id
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
+  tags                  = module.this.tags
 }
 
 data "aws_iam_policy_document" "role" {
