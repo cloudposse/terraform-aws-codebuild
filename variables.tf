@@ -132,6 +132,18 @@ variable "artifact_location" {
   description = "Location of artifact. Applies only for artifact of type S3"
 }
 
+variable "secondary_artifact_location" {
+  type        = string
+  default     = ""
+  description = "Location of secondary artifact. Must be an S3 reference"
+}
+
+variable "secondary_artifact_identifier" {
+  type        = string
+  default     = "static"
+  description = "Secondary artifact identifier. Must match the identifier in the build spec"
+}
+
 variable "report_build_status" {
   type        = bool
   default     = false
