@@ -27,5 +27,3 @@ environment_variables = [
 cache_expiration_days = 7
 
 cache_type = "S3"
-
-mfa_delete = false
