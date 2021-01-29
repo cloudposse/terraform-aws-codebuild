@@ -8,7 +8,6 @@ module "codebuild" {
   environment_variables       = var.environment_variables
   cache_expiration_days       = var.cache_expiration_days
   cache_type                  = var.cache_type
-  mfa_delete                  = var.mfa_delete
 
   context = module.this.context
 }

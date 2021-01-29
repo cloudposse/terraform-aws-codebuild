@@ -7,6 +7,7 @@ data "aws_region" "default" {
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
+  #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
   count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
@@ -14,8 +15,7 @@ resource "aws_s3_bucket" "cache_bucket" {
   tags          = module.this.tags
 
   versioning {
-    enabled    = var.versioning_enabled
-    mfa_delete = var.mfa_delete
+    enabled = var.versioning_enabled
   }
 
   dynamic "logging" {
