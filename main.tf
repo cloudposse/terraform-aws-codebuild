@@ -281,17 +281,18 @@ resource "aws_codebuild_project" "default" {
   }
 
   dynamic "secondary_sources"{
-      for_each = var.secondary_sources
+      iterator = secondary_source
+      for_each = length(var.secondary_sources) > 0 ? var.secondary_sources : []
       content {
-        git_clone_depth = lookup(secondary_source.value, git_clone_depth, null)
-        location = lookup(secondary_source.value,location, null)
+        git_clone_depth = secondary_source.value.git_clone_depth
+        location = secondary_source.value.location
         source_identifier = secondary_source.value.source_identifier
         type = secondary_source.value.type
-        insecure_ssl = lookup(secondary_source.value, insecure_ssl, null)
-        report_build_status =  lookup(secondary_source.value, report_build_status, null)
+        insecure_ssl = secondary_source.value.insecure_ssl
+        report_build_status =  secondary_source.value.report_build_status
 
         git_submodules_config {
-          fetch_submodules = lookup(secondary_source.value, fetch_submodules, null)
+          fetch_submodules = secondary_source.value.fetch_submodules
         }
       }
   }
