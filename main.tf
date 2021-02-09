@@ -137,7 +137,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 }
 
 data "aws_s3_bucket" "secondary_artifact" {
-  count  = module.this.enabled ? 1 : 0
+  count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
   bucket = var.secondary_artifact_location
 }
 
@@ -172,7 +172,7 @@ data "aws_iam_policy_document" "permissions" {
   }
 
   dynamic "statement" {
-    for_each = signum(length(var.secondary_artifact_location)) == 1 ? [""] : []
+    for_each = var.secondary_artifact_location != null ? [1] : []
     content {
       sid = ""
 
@@ -255,12 +255,12 @@ resource "aws_codebuild_project" "default" {
   # would need to be secondary if there were more than one. For reference, see
   # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html#action-reference-CodeBuild-config.
   dynamic "secondary_artifacts" {
-    for_each = signum(length(var.secondary_artifact_location)) == 1 ? [""] : []
+    for_each = var.secondary_artifact_location != null ? [1] : []
     content {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = true
+      encryption_disabled = var.secondary_artifact_encryption_disabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be

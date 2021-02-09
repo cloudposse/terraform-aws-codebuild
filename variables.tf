@@ -134,14 +134,20 @@ variable "artifact_location" {
 
 variable "secondary_artifact_location" {
   type        = string
-  default     = ""
+  default     = null
   description = "Location of secondary artifact. Must be an S3 reference"
 }
 
 variable "secondary_artifact_identifier" {
   type        = string
-  default     = "static"
+  default     = null
   description = "Secondary artifact identifier. Must match the identifier in the build spec"
+}
+
+variable "secondary_artifact_encryption_disabled" {
+  type        = bool
+  default     = false
+  description = "Set to true to disable encryption on the secondary artifact bucket"
 }
 
 variable "report_build_status" {
