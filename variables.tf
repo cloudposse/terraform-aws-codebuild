@@ -144,10 +144,10 @@ variable "secondary_artifact_identifier" {
   description = "Secondary artifact identifier. Must match the identifier in the build spec"
 }
 
-variable "secondary_artifact_encryption_disabled" {
+variable "secondary_artifact_encryption_enabled" {
   type        = bool
   default     = false
-  description = "Set to true to disable encryption on the secondary artifact bucket"
+  description = "Set to true to enable encryption on the secondary artifact bucket"
 }
 
 variable "report_build_status" {
