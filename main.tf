@@ -165,6 +165,60 @@ data "aws_iam_policy_document" "permissions" {
   }
 }
 
+data "aws_iam_policy_document" "vpc_permissions" {
+  count = module.this.enabled && length(var.vpc_config) > 0 ? 1 : 0
+
+  statement {
+    sid = ""
+
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeDhcpOptions",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeVpcs"
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+
+  statement {
+    sid = ""
+
+    actions = [
+      "ec2:CreateNetworkInterfacePermission"
+    ]
+
+    resources = [
+      "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:Subnet"
+      values = formatlist(
+        "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/%s",
+        var.vpc_config.subnets
+      )
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:AuthorizedService"
+      values = [
+        "codebuild.amazonaws.com"
+      ]
+    }
+
+  }
+}
+
+
 data "aws_iam_policy_document" "permissions_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   statement {
@@ -340,4 +394,3 @@ resource "aws_codebuild_project" "default" {
     }
   }
 }
-
