@@ -1,10 +1,14 @@
-region = "us-west-1"
+region = "us-east-2"
 
 namespace = "eg"
 
 stage = "test"
 
-name = "cedebuild-test"
+name = "codebuild-test"
+
+availability_zones = ["us-east-2a", "us-east-2b"]
+
+vpc_cidr_block = "172.16.0.0/16"
 
 cache_bucket_suffix_enabled = false
 
