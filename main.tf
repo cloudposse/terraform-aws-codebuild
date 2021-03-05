@@ -166,7 +166,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "vpc_permissions" {
-  count = module.this.enabled && length(var.vpc_config) > 0 ? 1 : 0
+  count = module.this.enabled && length(keys(var.vpc_config)) > 0 ? 1 : 0
 
   statement {
     sid = ""
