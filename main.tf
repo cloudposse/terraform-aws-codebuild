@@ -124,15 +124,15 @@ resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
   name   = module.this.id
   path   = "/service-role/"
-  policy = data.aws_iam_policy_document.permissions.json
+  policy = data.aws_iam_policy_document.combined_permissions.json
 }
 
-resource "aws_iam_policy" "vpc" {
-  count  = module.this.enabled && var.vpc_config != {} ? 1 : 0
-  name   = module.this.id
-  path   = "/service-role/"
-  policy = join("", data.aws_iam_policy_document.vpc_permissions.*.json)
-}
+# resource "aws_iam_policy" "vpc" {
+#   count  = module.this.enabled && var.vpc_config != {} ? 1 : 0
+#   name   = module.this.id
+#   path   = "/service-role/"
+#   policy = join("", data.aws_iam_policy_document.vpc_permissions.*.json)
+# }
 
 resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
@@ -193,7 +193,6 @@ data "aws_iam_policy_document" "vpc_permissions" {
     ]
   }
 
-
   statement {
     sid = ""
 
@@ -225,6 +224,12 @@ data "aws_iam_policy_document" "vpc_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "combined_permissions" {
+  override_policy_documents = compact([
+    data.aws_iam_policy_document.permissions.json,
+    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
+  ])
+}
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
@@ -250,11 +255,11 @@ resource "aws_iam_role_policy_attachment" "default" {
   role       = join("", aws_iam_role.default.*.id)
 }
 
-resource "aws_iam_role_policy_attachment" "vpc" {
-  count      = module.this.enabled && var.vpc_config != {} ? 1 : 0
-  policy_arn = join("", aws_iam_policy.vpc.*.arn)
-  role       = join("", aws_iam_role.default.*.id)
-}
+# resource "aws_iam_role_policy_attachment" "vpc" {
+#   count      = module.this.enabled && var.vpc_config != {} ? 1 : 0
+#   policy_arn = join("", aws_iam_policy.vpc.*.arn)
+#   role       = join("", aws_iam_role.default.*.id)
+# }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
