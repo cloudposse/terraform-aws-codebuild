@@ -127,6 +127,13 @@ resource "aws_iam_policy" "default" {
   policy = data.aws_iam_policy_document.permissions.json
 }
 
+resource "aws_iam_policy" "vpc" {
+  count  = module.this.enabled && var.vpc_config != {} ? 1 : 0
+  name   = module.this.id
+  path   = "/service-role/"
+  policy = join("", data.aws_iam_policy_document.vpc_permissions.*.json)
+}
+
 resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
@@ -240,6 +247,12 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 resource "aws_iam_role_policy_attachment" "default" {
   count      = module.this.enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
+}
+
+resource "aws_iam_role_policy_attachment" "vpc" {
+  count      = module.this.enabled && var.vpc_config != {} ? 1 : 0
+  policy_arn = join("", aws_iam_policy.vpc.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
