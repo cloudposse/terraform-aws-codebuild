@@ -186,6 +186,7 @@ variable "fetch_git_submodules" {
   description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
 }
 
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project#vpc_config
 variable "vpc_config" {
   type        = any
   default     = {}
