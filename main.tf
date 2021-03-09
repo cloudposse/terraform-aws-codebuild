@@ -124,7 +124,7 @@ resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
   name   = module.this.id
   path   = "/service-role/"
-  policy = join("", data.aws_iam_policy_document.permissions.*.json)
+  policy = data.aws_iam_policy_document.combined_permissions.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
@@ -190,6 +190,65 @@ data "aws_iam_policy_document" "permissions" {
       ]
     }
   }
+}
+
+data "aws_iam_policy_document" "vpc_permissions" {
+  count = module.this.enabled && var.vpc_config != {} ? 1 : 0
+
+  statement {
+    sid = ""
+
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeDhcpOptions",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeVpcs"
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid = ""
+
+    actions = [
+      "ec2:CreateNetworkInterfacePermission"
+    ]
+
+    resources = [
+      "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:Subnet"
+      values = formatlist(
+        "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/%s",
+        var.vpc_config.subnets
+      )
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:AuthorizedService"
+      values = [
+        "codebuild.amazonaws.com"
+      ]
+    }
+
+  }
+}
+
+data "aws_iam_policy_document" "combined_permissions" {
+  override_policy_documents = compact([
+    data.aws_iam_policy_document.permissions.json,
+    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
+  ])
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
@@ -391,4 +450,3 @@ resource "aws_codebuild_project" "default" {
     }
   }
 }
-
