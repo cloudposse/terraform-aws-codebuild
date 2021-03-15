@@ -20,7 +20,7 @@ module "build" {
   # Extra permissions
   extra_permissions = var.extra_permissions
 
-  # environment_variables 
+  # environment_variables
   aws_region            = var.aws_region
   aws_account_id        = var.aws_account_id
   environment_variables = var.environment_variables
@@ -51,8 +51,5 @@ module "build" {
   badge_enabled = var.badge_enabled
   attributes    = var.attributes
   tags          = var.tags
-
-
-
 
 }
