@@ -194,14 +194,14 @@ variable "vpc_config" {
 
 variable "secondary_sources" {
   type = list(object(
-  {
-    git_clone_depth = number
-    location = string
-    source_identifier = string
-    type = string
-    fetch_submodules = bool
-    insecure_ssl = bool
-    report_build_status = bool
+    {
+      git_clone_depth     = number
+      location            = string
+      source_identifier   = string
+      type                = string
+      fetch_submodules    = bool
+      insecure_ssl        = bool
+      report_build_status = bool
   }))
 
   default = []
@@ -216,7 +216,7 @@ variable "logs_config" {
 }
 
 variable "extra_permissions" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
 }
