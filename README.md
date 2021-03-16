@@ -240,6 +240,7 @@ Available targets:
 | secondary\_artifact\_encryption\_enabled | Set to true to enable encryption on the secondary artifact bucket | `bool` | `false` | no |
 | secondary\_artifact\_identifier | Secondary artifact identifier. Must match the identifier in the build spec | `string` | `null` | no |
 | secondary\_artifact\_location | Location of secondary artifact. Must be an S3 reference | `string` | `null` | no |
+| secondary\_sources | (Optional) secondary source for the codebuild project in addition to the primary location | <pre>list(object(<br>    {<br>      git_clone_depth     = number<br>      location            = string<br>      source_identifier   = string<br>      type                = string<br>      fetch_submodules    = bool<br>      insecure_ssl        = bool<br>      report_build_status = bool<br>  }))</pre> | `[]` | no |
 | source\_credential\_auth\_type | The type of authentication used to connect to a GitHub, GitHub Enterprise, or Bitbucket repository. | `string` | `"PERSONAL_ACCESS_TOKEN"` | no |
 | source\_credential\_server\_type | The source provider used for this project. | `string` | `"GITHUB"` | no |
 | source\_credential\_token | For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password. | `string` | `""` | no |

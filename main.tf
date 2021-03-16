@@ -418,6 +418,22 @@ resource "aws_codebuild_project" "default" {
     }
   }
 
+  dynamic "secondary_sources" {
+    for_each = var.secondary_sources
+    content {
+      git_clone_depth     = secondary_source.value.git_clone_depth
+      location            = secondary_source.value.location
+      source_identifier   = secondary_source.value.source_identifier
+      type                = secondary_source.value.type
+      insecure_ssl        = secondary_source.value.insecure_ssl
+      report_build_status = secondary_source.value.report_build_status
+
+      git_submodules_config {
+        fetch_submodules = secondary_source.value.fetch_submodules
+      }
+    }
+  }
+
   dynamic "vpc_config" {
     for_each = length(var.vpc_config) > 0 ? [""] : []
     content {
