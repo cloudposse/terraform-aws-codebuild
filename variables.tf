@@ -108,6 +108,20 @@ variable "image_tag" {
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
 }
 
+variable "secondary_sources" {
+  type = list(object(
+    {
+      git_clone_depth     = number
+      location            = string
+      source_identifier   = string
+      type                = string
+      fetch_submodules    = bool
+      insecure_ssl        = bool
+      report_build_status = bool
+  }))
+  default = []
+}
+
 variable "source_type" {
   type        = string
   default     = "CODEPIPELINE"

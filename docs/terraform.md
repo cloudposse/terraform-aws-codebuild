@@ -79,6 +79,7 @@
 | privileged\_mode | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | `bool` | `false` | no |
 | regex\_replace\_chars | Regex to replace chars with empty string in `namespace`, `environment`, `stage` and `name`.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | report\_build\_status | Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source\_type is BITBUCKET or GITHUB | `bool` | `false` | no |
+| secondary\_sources | A list of maps, that contain secondary repository parameters for the build | <pre>list(object(<br>    {<br>      git_clone_depth     = number<br>      location            = string<br>      source_identifier   = string<br>      type                = string<br>      fetch_submodules    = bool<br>      insecure_ssl        = string<br>      report_build_status = string<br>  }))</pre> | <pre>""</pre> | no |
 | source\_credential\_auth\_type | The type of authentication used to connect to a GitHub, GitHub Enterprise, or Bitbucket repository. | `string` | `"PERSONAL_ACCESS_TOKEN"` | no |
 | source\_credential\_server\_type | The source provider used for this project. | `string` | `"GITHUB"` | no |
 | source\_credential\_token | For GitHub or GitHub Enterprise, this is the personal access token. For Bitbucket, this is the app password. | `string` | `""` | no |
