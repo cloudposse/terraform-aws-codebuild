@@ -368,7 +368,7 @@ resource "aws_codebuild_project" "default" {
   }
 
   dynamic "secondary_sources" {
-    for_each = var.secondary_sources ? [""] : []
+    for_each = var.secondary_sources
     content {
       git_clone_depth     = secondary_source.value.git_clone_depth
       location            = secondary_source.value.location
