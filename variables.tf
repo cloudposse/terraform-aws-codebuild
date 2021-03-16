@@ -120,7 +120,7 @@ variable "secondary_sources" {
       report_build_status = bool
   }))
   default     = []
-  description = "(Optional) secondary source for the codebuild project next to the primary location defined in variable source_location"
+  description = "(Optional) secondary source for the codebuild project in addition to the primary location"
 }
 
 variable "source_type" {
