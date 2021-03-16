@@ -4,6 +4,11 @@ data "aws_caller_identity" "default" {
 data "aws_region" "default" {
 }
 
+data "aws_s3_bucket" "secondary_artifact" {
+  count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
+  bucket = var.secondary_artifact_location
+}
+
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
