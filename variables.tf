@@ -119,7 +119,8 @@ variable "secondary_sources" {
       insecure_ssl        = bool
       report_build_status = bool
   }))
-  default = []
+  default     = []
+  description = "(Optional) secondary source for the built next to the primary location defined in variable source_location"
 }
 
 variable "source_type" {
