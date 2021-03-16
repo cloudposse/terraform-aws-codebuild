@@ -136,7 +136,14 @@ resource "aws_iam_policy" "default_cache_bucket" {
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
+data "aws_s3_bucket" "secondary_artifact" {
+  count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
+  bucket = var.secondary_artifact_location
+}
+
 data "aws_iam_policy_document" "permissions" {
+  count = module.this.enabled ? 1 : 0
+
   statement {
     sid = ""
 
@@ -162,6 +169,26 @@ data "aws_iam_policy_document" "permissions" {
     resources = [
       "*",
     ]
+  }
+
+  dynamic "statement" {
+    for_each = var.secondary_artifact_location != null ? [1] : []
+    content {
+      sid = ""
+
+      actions = [
+        "s3:PutObject",
+        "s3:GetBucketAcl",
+        "s3:GetBucketLocation"
+      ]
+
+      effect = "Allow"
+
+      resources = [
+        join("", data.aws_s3_bucket.secondary_artifact.*.arn),
+        "${join("", data.aws_s3_bucket.secondary_artifact.*.arn)}/*",
+      ]
+    }
   }
 }
 
@@ -219,7 +246,7 @@ data "aws_iam_policy_document" "vpc_permissions" {
 
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
-    data.aws_iam_policy_document.permissions.json,
+    join("", data.aws_iam_policy_document.permissions.*.json),
     var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
   ])
 }
@@ -278,6 +305,30 @@ resource "aws_codebuild_project" "default" {
   artifacts {
     type     = var.artifact_type
     location = var.artifact_location
+  }
+
+  # Since the output type is restricted to S3 by the provider (this appears to
+  # be an bug in AWS, rather than an architectural decision; see this issue for
+  # discussion: https://github.com/hashicorp/terraform-provider-aws/pull/9652),
+  # this cannot be a CodePipeline output. Otherwise, _all_ of the artifacts
+  # would need to be secondary if there were more than one. For reference, see
+  # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html#action-reference-CodeBuild-config.
+  dynamic "secondary_artifacts" {
+    for_each = var.secondary_artifact_location != null ? [1] : []
+    content {
+      type                = "S3"
+      location            = var.secondary_artifact_location
+      artifact_identifier = var.secondary_artifact_identifier
+      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      # According to AWS documention, in order to have the artifacts written
+      # to the root of the bucket, the 'namespace_type' should be 'NONE'
+      # (which is the default), 'name' should be '/', and 'path' should be
+      # empty. For reference, see https://docs.aws.amazon.com/codebuild/latest/APIReference/API_ProjectArtifacts.html.
+      # However, I was unable to get this to deploy to the root of the bucket
+      # unless path was also set to '/'.
+      path = "/"
+      name = "/"
+    }
   }
 
   cache {
