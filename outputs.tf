@@ -18,6 +18,11 @@ output "role_arn" {
   value       = join("", aws_iam_role.default.*.arn)
 }
 
+output "role_name" {
+  description = "IAM Role name"
+  value       = join("", aws_iam_role.default.*.name)
+}
+
 output "cache_bucket_name" {
   description = "Cache S3 bucket name"
   value       = module.this.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "UNSET"
