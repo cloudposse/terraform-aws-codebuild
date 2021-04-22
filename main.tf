@@ -390,6 +390,7 @@ resource "aws_codebuild_project" "default" {
       content {
         name  = environment_variable.value.name
         value = environment_variable.value.value
+        type  = environment_variable.value.type
       }
     }
 
