@@ -22,7 +22,7 @@ variable "description" {
 }
 
 variable "concurrent_build_limit" {
-  type        = integer
+  type        = number
   default     = null
   description = "Specify a maximum number of concurrent builds for the project. The value specified must be greater than 0 and less than the account concurrent running builds limit."
 }
