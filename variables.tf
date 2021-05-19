@@ -21,6 +21,12 @@ variable "description" {
   description = "Short description of the CodeBuild project"
 }
 
+variable "concurrent_build_limit" {
+  type        = integer
+  default     = null
+  description = "Specify a maximum number of concurrent builds for the project. The value specified must be greater than 0 and less than the account concurrent running builds limit."
+}
+
 variable "cache_expiration_days" {
   default     = 7
   description = "How many days should the build cache be kept. It only works when cache_type is 'S3'"
