@@ -292,6 +292,7 @@ resource "aws_codebuild_source_credential" "authorization" {
 resource "aws_codebuild_project" "default" {
   count          = module.this.enabled ? 1 : 0
   name           = module.this.id
+  description    = var.description
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
@@ -319,7 +320,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
