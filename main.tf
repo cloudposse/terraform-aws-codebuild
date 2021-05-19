@@ -321,7 +321,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = !var.secondary_artifact_encryption_enabled
+      encryption_disabled = ! var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
