@@ -18,7 +18,7 @@ variable "environment_variables" {
 
 variable "description" {
   default     = ""
-  description = "Description of the CodeBuild project"
+  description = "Short description of the CodeBuild project"
 }
 
 variable "cache_expiration_days" {
