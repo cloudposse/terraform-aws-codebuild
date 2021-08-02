@@ -281,13 +281,12 @@ Like this project? Please give it a ★ on [our GitHub](https://github.com/cloud
 Are you using this project or any of our other projects? Consider [leaving a testimonial][testimonial]. =)
 
 
+
 ## Related Projects
 
 Check out these related projects.
 
 - [terraform-aws-ecs-codepipeline](https://github.com/cloudposse/terraform-aws-ecs-codepipeline) - Terraform Module for CI/CD with AWS Code Pipeline and Code Build for ECS
-
-
 
 ## Help
 
@@ -418,8 +417,8 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 ### Contributors
 
 <!-- markdownlint-disable -->
-|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Jamie Nelson][Jamie-BitfFlight_avatar]][Jamie-BitfFlight_homepage]<br/>[Jamie Nelson][Jamie-BitfFlight_homepage] | [![Sarkis Varozian][sarkis_avatar]][sarkis_homepage]<br/>[Sarkis Varozian][sarkis_homepage] | [![Bircan Bilici][brcnblc_avatar]][brcnblc_homepage]<br/>[Bircan Bilici][brcnblc_homepage] |
-|---|---|---|---|---|---|
+|  [![Erik Osterman][osterman_avatar]][osterman_homepage]<br/>[Erik Osterman][osterman_homepage] | [![Igor Rodionov][goruha_avatar]][goruha_homepage]<br/>[Igor Rodionov][goruha_homepage] | [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Jamie Nelson][Jamie-BitFlight_avatar]][Jamie-BitFlight_homepage]<br/>[Jamie Nelson][Jamie-BitFlight_homepage] | [![Sarkis Varozian][sarkis_avatar]][sarkis_homepage]<br/>[Sarkis Varozian][sarkis_homepage] | [![Bircan Bilici][brcnblc_avatar]][brcnblc_homepage]<br/>[Bircan Bilici][brcnblc_homepage] | [![RB][nitrocode_avatar]][nitrocode_homepage]<br/>[RB][nitrocode_homepage] |
+|---|---|---|---|---|---|---|
 <!-- markdownlint-restore -->
 
   [osterman_homepage]: https://github.com/osterman
@@ -428,12 +427,14 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
   [goruha_avatar]: https://img.cloudposse.com/150x150/https://github.com/goruha.png
   [aknysh_homepage]: https://github.com/aknysh
   [aknysh_avatar]: https://img.cloudposse.com/150x150/https://github.com/aknysh.png
-  [Jamie-BitfFlight_homepage]: https://github.com/Jamie-BitfFlight
-  [Jamie-BitfFlight_avatar]: https://img.cloudposse.com/150x150/https://github.com/Jamie-BitfFlight.png
+  [Jamie-BitFlight_homepage]: https://github.com/Jamie-BitFlight
+  [Jamie-BitFlight_avatar]: https://img.cloudposse.com/150x150/https://github.com/Jamie-BitFlight.png
   [sarkis_homepage]: https://github.com/sarkis
   [sarkis_avatar]: https://img.cloudposse.com/150x150/https://github.com/sarkis.png
   [brcnblc_homepage]: https://github.com/brcnblc
   [brcnblc_avatar]: https://img.cloudposse.com/150x150/https://github.com/brcnblc.png
+  [nitrocode_homepage]: https://github.com/nitrocode
+  [nitrocode_avatar]: https://img.cloudposse.com/150x150/https://github.com/nitrocode.png
 
 [![README Footer][readme_footer_img]][readme_footer_link]
 [![Beacon][beacon]][website]
