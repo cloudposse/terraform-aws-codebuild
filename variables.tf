@@ -86,6 +86,12 @@ variable "github_token" {
   description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
 }
 
+variable "github_token_type" {
+  type        = string
+  default     = "PARAMETER_STORE"
+  description = "Storage type of GITHUB_TOKEN environment variable (`PARAMETER_STORE`, `PLAINTEXT`, `SECRETS_MANAGER`)"
+}
+
 variable "aws_region" {
   type        = string
   default     = ""

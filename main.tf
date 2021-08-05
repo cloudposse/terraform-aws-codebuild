@@ -382,6 +382,7 @@ resource "aws_codebuild_project" "default" {
       content {
         name  = "GITHUB_TOKEN"
         value = var.github_token
+        type  = var.github_token_type
       }
     }
 
