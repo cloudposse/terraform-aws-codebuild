@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "cache_bucket" {
     for_each = var.access_log_bucket_name != "" ? [1] : []
     content {
       target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
+      target_prefix = "logs/${var.name}/"
     }
   }
 
@@ -61,7 +61,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = "${var.name}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -97,7 +97,7 @@ locals {
 
 resource "aws_iam_role" "default" {
   count                 = module.this.enabled ? 1 : 0
-  name                  = module.this.id
+  name                  = var.name
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
   tags                  = module.this.tags
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "role" {
 
 resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
-  name   = module.this.id
+  name   = var.name
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.combined_permissions.json
 }
@@ -131,7 +131,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
 
-  name   = "${module.this.id}-cache-bucket"
+  name   = "${var.name}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
@@ -264,7 +264,7 @@ resource "aws_codebuild_source_credential" "authorization" {
 
 resource "aws_codebuild_project" "default" {
   count          = module.this.enabled ? 1 : 0
-  name           = module.this.id
+  name           = var.name
   service_role   = join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
