@@ -123,16 +123,18 @@ module "build" {
     # Optional extra environment variables
     environment_variables = [{
         name  = "JENKINS_URL"
+        type  = "PLAINTEXT"
         value = "https://jenkins.example.com"
       },
       {
         name  = "COMPANY_NAME"
+        type  = "PLAINTEXT"
         value = "Amazon"
       },
       {
         name = "TIME_ZONE"
+        type  = "PLAINTEXT"
         value = "Pacific/Auckland"
-
       }]
 }
 ```
