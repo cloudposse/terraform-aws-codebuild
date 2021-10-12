@@ -52,7 +52,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 }
 
 resource "random_string" "bucket_prefix" {
-  count   = module.this.enabled ? 1 : 0
+  count   = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   length  = 12
   number  = false
   upper   = false
@@ -93,17 +93,19 @@ locals {
 
   # Final Map Selected from above
   cache = local.cache_options[var.cache_type]
+
 }
 
 resource "aws_iam_role" "default" {
-  count                 = module.this.enabled ? 1 : 0
+  count                 = module.this.enabled && var.service_role == "" ? 1 : 0
   name                  = module.this.id
-  assume_role_policy    = data.aws_iam_policy_document.role.json
+  assume_role_policy    = data.aws_iam_policy_document.role.*.json
   force_detach_policies = true
   tags                  = module.this.tags
 }
 
 data "aws_iam_policy_document" "role" {
+  count = module.this.enabled && var.service_role == "" ? 1 : 0
   statement {
     sid = ""
 
@@ -121,14 +123,14 @@ data "aws_iam_policy_document" "role" {
 }
 
 resource "aws_iam_policy" "default" {
-  count  = module.this.enabled ? 1 : 0
+  count  = module.this.enabled && var.service_role == "" ? 1 : 0
   name   = module.this.id
   path   = "/service-role/"
-  policy = data.aws_iam_policy_document.combined_permissions.json
+  policy = data.aws_iam_policy_document.combined_permissions.*.json
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
-  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled && var.service_role == "" ? 1 : 0
 
 
   name   = "${module.this.id}-cache-bucket"
@@ -142,7 +144,7 @@ data "aws_s3_bucket" "secondary_artifact" {
 }
 
 data "aws_iam_policy_document" "permissions" {
-  count = module.this.enabled ? 1 : 0
+  count = module.this.enabled && var.service_role == "" ? 1 : 0
 
   statement {
     sid = ""
@@ -193,7 +195,7 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 data "aws_iam_policy_document" "vpc_permissions" {
-  count = module.this.enabled && var.vpc_config != {} ? 1 : 0
+  count = module.this.enabled && var.vpc_config != {} && var.service_role == "" ? 1 : 0
 
   statement {
     sid = ""
@@ -245,6 +247,7 @@ data "aws_iam_policy_document" "vpc_permissions" {
 }
 
 data "aws_iam_policy_document" "combined_permissions" {
+  count = module.this.enabled && var.service_role == "" ? 1 : 0
   override_policy_documents = compact([
     join("", data.aws_iam_policy_document.permissions.*.json),
     var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
@@ -252,7 +255,7 @@ data "aws_iam_policy_document" "combined_permissions" {
 }
 
 data "aws_iam_policy_document" "permissions_cache_bucket" {
-  count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  count = module.this.enabled && local.s3_cache_enabled && var.service_role == "" ? 1 : 0
   statement {
     sid = ""
 
@@ -270,13 +273,13 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  count      = module.this.enabled ? 1 : 0
+  count      = module.this.enabled && var.service_role == "" ? 1 : 0
   policy_arn = join("", aws_iam_policy.default.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
-  count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  count      = module.this.enabled && local.s3_cache_enabled && var.service_role == "" ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
@@ -292,7 +295,7 @@ resource "aws_codebuild_source_credential" "authorization" {
 resource "aws_codebuild_project" "default" {
   count          = module.this.enabled ? 1 : 0
   name           = module.this.id
-  service_role   = join("", aws_iam_role.default.*.arn)
+  service_role   = var.service_role != "" ? var.service_role : join("", aws_iam_role.default.*.arn)
   badge_enabled  = var.badge_enabled
   build_timeout  = var.build_timeout
   source_version = var.source_version != "" ? var.source_version : null
