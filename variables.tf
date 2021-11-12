@@ -246,6 +246,18 @@ variable "extra_permissions" {
   description = "List of action strings which will be added to IAM service account permissions."
 }
 
+variable "iam_role_path" {
+  type        = string
+  default     = null
+  description = "Path to the role."
+}
+
+variable "iam_permissions_boundary" {
+  type        = string
+  default     = null
+  description = "ARN of the policy that is used to set the permissions boundary for the role."
+}
+
 variable "encryption_enabled" {
   type        = bool
   default     = false
