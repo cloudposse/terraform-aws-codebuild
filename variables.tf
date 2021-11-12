@@ -252,6 +252,12 @@ variable "iam_role_path" {
   description = "Path to the role."
 }
 
+variable "iam_policy_path" {
+  type        = string
+  default     = "/service-role/"
+  description = "Path to the role."
+}
+
 variable "iam_permissions_boundary" {
   type        = string
   default     = null

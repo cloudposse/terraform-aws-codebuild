@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "role" {
 resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
   name   = module.this.id
-  path   = "/service-role/"
+  path   = var.iam_policy_path
   policy = data.aws_iam_policy_document.combined_permissions.json
 }
 
@@ -134,7 +134,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 
 
   name   = "${module.this.id}-cache-bucket"
-  path   = "/service-role/"
+  path   = var.iam_policy_path
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
