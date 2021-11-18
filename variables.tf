@@ -17,6 +17,7 @@ variable "environment_variables" {
 }
 
 variable "description" {
+  type        = string
   default     = "Managed by Terraform"
   description = "Short description of the CodeBuild project"
 }
