@@ -290,12 +290,14 @@ resource "aws_codebuild_source_credential" "authorization" {
 }
 
 resource "aws_codebuild_project" "default" {
-  count          = module.this.enabled ? 1 : 0
-  name           = module.this.id
-  service_role   = join("", aws_iam_role.default.*.arn)
-  badge_enabled  = var.badge_enabled
-  build_timeout  = var.build_timeout
-  source_version = var.source_version != "" ? var.source_version : null
+  count                  = module.this.enabled ? 1 : 0
+  name                   = module.this.id
+  description            = var.description
+  concurrent_build_limit = var.concurrent_build_limit
+  service_role           = join("", aws_iam_role.default.*.arn)
+  badge_enabled          = var.badge_enabled
+  build_timeout          = var.build_timeout
+  source_version         = var.source_version != "" ? var.source_version : null
   tags = {
     for name, value in module.this.tags :
     name => value
