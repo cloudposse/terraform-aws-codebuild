@@ -136,9 +136,11 @@ resource "aws_iam_policy" "default_cache_bucket" {
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
 }
 
-data "aws_s3_bucket" "secondary_artifact" {
-  count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
-  bucket = var.secondary_artifact_location
+resource "aws_iam_policy" "default_pipeline_bucket" {
+  count  = var.s3_bucket_enabled ? 1 : 0
+  name   = "${module.label.id}-pipeline-bucket"
+  path   = "/service-role/"
+  policy = join("", data.aws_iam_policy_document.permissions_source_bucket.*.json)
 }
 
 data "aws_iam_policy_document" "permissions" {
@@ -160,6 +162,7 @@ data "aws_iam_policy_document" "permissions" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "ec2:*",
       "ssm:GetParameters",
       "secretsmanager:GetSecretValue",
     ], var.extra_permissions))
@@ -265,6 +268,25 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
     resources = [
       join("", aws_s3_bucket.cache_bucket.*.arn),
       "${join("", aws_s3_bucket.cache_bucket.*.arn)}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "permissions_source_bucket" {
+  count = var.s3_bucket_enabled ? 1 : 0
+
+  statement {
+    sid = ""
+
+    actions = [
+      "s3:*",
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      var.source_s3_bucket_arn,
+      "${var.source_s3_bucket_arn}/*",
     ]
   }
 }
