@@ -345,9 +345,12 @@ resource "aws_codebuild_project" "default" {
     type            = var.build_type
     privileged_mode = var.privileged_mode
 
-    environment_variable {
-      name  = "AWS_REGION"
-      value = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+    dynamic "environment_variable" {
+      for_each = signum(length(var.aws_account_id)) == 0 && contains(var.environment_variables.*.name, "AWS_REGION") ? [] : [1]
+      content {
+        name  = "AWS_REGION"
+        value = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+      }
     }
 
     environment_variable {
