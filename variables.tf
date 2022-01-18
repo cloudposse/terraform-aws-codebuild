@@ -167,6 +167,12 @@ variable "artifact_location" {
   description = "Location of artifact. Applies only for artifact of type S3"
 }
 
+variable "artifact_override_name" {
+  type        = bool
+  default     = false
+  description = "Whether a name specified in the build specification overrides the artifact name."
+}
+
 variable "secondary_artifact_location" {
   type        = string
   default     = null

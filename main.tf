@@ -305,8 +305,9 @@ resource "aws_codebuild_project" "default" {
   }
 
   artifacts {
-    type     = var.artifact_type
-    location = var.artifact_location
+    type                   = var.artifact_type
+    location               = var.artifact_location
+    override_artifact_name = var.artifact_override_name
   }
 
   # Since the output type is restricted to S3 by the provider (this appears to
