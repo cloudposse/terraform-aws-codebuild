@@ -167,6 +167,12 @@ variable "artifact_location" {
   description = "Location of artifact. Applies only for artifact of type S3"
 }
 
+variable "artifact_encryption_disabled" {
+  type        = bool
+  default     = false
+  description = "Whether to disable encrypting output artifacts. If type is set to NO_ARTIFACTS, this value is ignored. Defaults to false"
+}
+
 variable "artifact_override_name" {
   type        = bool
   default     = false
