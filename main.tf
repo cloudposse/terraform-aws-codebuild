@@ -5,49 +5,67 @@ data "aws_region" "default" {
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
-  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
-  #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
-  #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
   count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
-  acl           = "private"
+
   force_destroy = true
   tags          = module.this.tags
+}
 
-  versioning {
-    enabled = var.versioning_enabled
-  }
+resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
 
-  dynamic "logging" {
-    for_each = var.access_log_bucket_name != "" ? [1] : []
-    content {
-      target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
-    }
-  }
+  rule {
+    id          = "codebuildcache"
+    status      = "Enabled"
 
-  lifecycle_rule {
-    id      = "codebuildcache"
-    enabled = true
+    filter {
+      and {
+        prefix    = "/"
 
-    prefix = "/"
-    tags   = module.this.tags
-
-    expiration {
-      days = var.cache_expiration_days
-    }
-  }
-
-  dynamic "server_side_encryption_configuration" {
-    for_each = var.encryption_enabled ? ["true"] : []
-
-    content {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm = "AES256"
-        }
+        tags      = module.label.tags
       }
     }
+
+    expiration {
+      days        = var.cache_expiration_days
+    }
+  }
+}
+
+resource "aws_s3_bucket_acl" "acl" {
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
+
+  acl           = "private"
+}
+
+resource "aws_s3_bucket_logging" "example" {
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
+
+  target_bucket = var.access_log_bucket_name
+  target_prefix = "logs/${module.this.id}/"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "versioning" {
+  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
