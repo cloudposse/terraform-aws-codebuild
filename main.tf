@@ -24,7 +24,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       and {
         prefix    = "/"
 
-        tags      = module.label.tags
+        tags      = module.this.tags
       }
     }
 
@@ -156,7 +156,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 
 resource "aws_iam_policy" "default_pipeline_bucket" {
   count  = var.s3_bucket_enabled ? 1 : 0
-  name   = "${module.label.id}-pipeline-bucket"
+  name   = "${module.this.id}-pipeline-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_source_bucket.*.json)
 }
