@@ -176,20 +176,8 @@ variable "report_build_status" {
   description = "Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source_type is BITBUCKET or GITHUB"
 }
 
-variable "security_group_ids" {
-  default = "security groups"
-}
-
-variable "subnet_ids" {
-  default = "subnets this build has access to"
-}
-
 variable "s3_bucket_enabled" {
   description = "whether or not an S3 bucket is enabled for the codebuild project"
-}
-
-variable "vpc_id" {
-  description = "VPC id this build belongs to"
 }
 
 variable "git_clone_depth" {
