@@ -8,45 +8,101 @@ resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
-  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
-  bucket        = local.cache_bucket_name_normalised
-  acl           = "private"
+  count  = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  bucket = local.cache_bucket_name_normalised
+  # acl           = "private"
   force_destroy = true
   tags          = module.this.tags
 
-  versioning {
-    enabled = var.versioning_enabled
-  }
+  # versioning {
+  #   enabled = var.versioning_enabled
+  # }
 
-  dynamic "logging" {
-    for_each = var.access_log_bucket_name != "" ? [1] : []
-    content {
-      target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
+  # dynamic "logging" {
+  #   for_each = var.access_log_bucket_name != "" ? [1] : []
+  #   content {
+  #     target_bucket = var.access_log_bucket_name
+  #     target_prefix = "logs/${module.this.id}/"
+  #   }
+  # }
+
+  # lifecycle_rule {
+  #   id      = "codebuildcache"
+  #   enabled = true
+
+  #   prefix = "/"
+  #   tags   = module.this.tags
+
+  #   expiration {
+  #     days = var.cache_expiration_days
+  #   }
+  # }
+
+  # dynamic "server_side_encryption_configuration" {
+  #   for_each = var.encryption_enabled ? ["true"] : []
+
+  #   content {
+  #     rule {
+  #       apply_server_side_encryption_by_default {
+  #         sse_algorithm = "AES256"
+  #       }
+  #     }
+  #   }
+  # }
+}
+
+# S3 acl resource support for AWS provider V4
+resource "aws_s3_bucket_acl" "cache_bucket" {
+  bucket = aws_s3_bucket.cache_bucket[0].id
+  acl    = "private"
+}
+
+# S3 versioning resource support for AWS provider v4
+resource "aws_s3_bucket_versioning" "cache_bucket" {
+  bucket = aws_s3_bucket.cache_bucket[0].id
+  versioning_configuration {
+    status = var.versioning_enabled ? "Enabled" : "Suspended"
+  }
+}
+
+# S3 logging resource support for AWS provider v4
+resource "aws_s3_bucket_logging" "cache_bucket" {
+  for_each = var.access_log_bucket_name != "" ? [1] : []
+  bucket   = aws_s3_bucket.cache_bucket[0].id
+
+  target_bucket = var.access_log_bucket_name
+  target_prefix = "logs/${module.this.id}/"
+}
+
+# S3 lifecycle configuration support for AWS provider v4
+resource "aws_s3_bucket_lifecycle_configuration" "cache_bucket" {
+  depends_on = [aws_s3_bucket_versioning.cache_bucket]
+
+  bucket = aws_s3_bucket.cache_bucket[0].bucket
+
+  rule {
+    id = "codebuildcache"
+
+    filter {
+      prefix = "/"
     }
-  }
-
-  lifecycle_rule {
-    id      = "codebuildcache"
-    enabled = true
-
-    prefix = "/"
-    tags   = module.this.tags
 
     expiration {
       days = var.cache_expiration_days
     }
+
+    status = "Enabled"
   }
+}
 
-  dynamic "server_side_encryption_configuration" {
-    for_each = var.encryption_enabled ? ["true"] : []
+# S3 server side encryption support for AWS provider v4
+resource "aws_s3_bucket_server_side_encryption_configuration" "cache_bucket" {
+  for_each = var.encryption_enabled ? ["true"] : []
+  bucket   = aws_s3_bucket.cache_bucket[0].bucket
 
-    content {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm = "AES256"
-        }
-      }
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -321,7 +377,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
