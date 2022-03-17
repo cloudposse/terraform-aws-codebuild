@@ -53,12 +53,14 @@ resource "aws_s3_bucket" "cache_bucket" {
 
 # S3 acl resource support for AWS provider V4
 resource "aws_s3_bucket_acl" "cache_bucket" {
+  count  = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket = aws_s3_bucket.cache_bucket[0].id
   acl    = "private"
 }
 
 # S3 versioning resource support for AWS provider v4
 resource "aws_s3_bucket_versioning" "cache_bucket" {
+  count  = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   bucket = aws_s3_bucket.cache_bucket[0].id
   versioning_configuration {
     status = var.versioning_enabled ? "Enabled" : "Suspended"
@@ -67,7 +69,7 @@ resource "aws_s3_bucket_versioning" "cache_bucket" {
 
 # S3 logging resource support for AWS provider v4
 resource "aws_s3_bucket_logging" "cache_bucket" {
-  for_each = var.access_log_bucket_name != "" ? [1] : []
+  for_each = module.this.enabled && local.s3_cache_enabled && var.access_log_bucket_name != "" ? toset([1]) : toset([])
   bucket   = aws_s3_bucket.cache_bucket[0].id
 
   target_bucket = var.access_log_bucket_name
@@ -76,7 +78,8 @@ resource "aws_s3_bucket_logging" "cache_bucket" {
 
 # S3 lifecycle configuration support for AWS provider v4
 resource "aws_s3_bucket_lifecycle_configuration" "cache_bucket" {
-  depends_on = [aws_s3_bucket_versioning.cache_bucket]
+  count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  depends_on = [aws_s3_bucket_versioning.cache_bucket[0]]
 
   bucket = aws_s3_bucket.cache_bucket[0].bucket
 
@@ -97,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cache_bucket" {
 
 # S3 server side encryption support for AWS provider v4
 resource "aws_s3_bucket_server_side_encryption_configuration" "cache_bucket" {
-  for_each = var.encryption_enabled ? ["true"] : []
+  for_each = module.this.enabled && local.s3_cache_enabled && var.encryption_enabled ? toset(["true"]) : toset([])
   bucket   = aws_s3_bucket.cache_bucket[0].bucket
 
   rule {
