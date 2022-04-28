@@ -1,40 +1,31 @@
-variable "namespace" {
-  type        = string
-  default     = ""
-  description = "Namespace, which could be your organization name, e.g. 'eg' or 'cp'"
-}
-
-variable "stage" {
-  type        = string
-  default     = ""
-  description = "Stage, e.g. 'prod', 'staging', 'dev', or 'test'"
-}
-
-variable "name" {
-  type        = string
-  description = "Solution name, e.g. 'app' or 'jenkins'"
-}
-
 variable "environment_variables" {
   type = list(object(
     {
       name  = string
       value = string
+      type  = string
   }))
 
   default = [
     {
       name  = "NO_ADDITIONAL_BUILD_VARS"
       value = "TRUE"
+      type  = "PLAINTEXT"
   }]
 
-  description = "A list of maps, that contain both the key 'name' and the key 'value' to be used as additional environment variables for the build"
+  description = "A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER_STORE', or 'SECRETS_MANAGER'"
 }
 
-variable "enabled" {
-  type        = bool
-  default     = true
-  description = "A boolean to enable/disable resource creation"
+variable "description" {
+  type        = string
+  default     = "Managed by Terraform"
+  description = "Short description of the CodeBuild project"
+}
+
+variable "concurrent_build_limit" {
+  type        = number
+  default     = null
+  description = "Specify a maximum number of concurrent builds for the project. The value specified must be greater than 0 and less than the account concurrent running builds limit."
 }
 
 variable "cache_expiration_days" {
@@ -95,24 +86,6 @@ variable "buildspec" {
   description = "Optional buildspec declaration to use for building the project"
 }
 
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `name`, `namespace`, `stage`, etc."
-}
-
-variable "attributes" {
-  type        = list(string)
-  default     = []
-  description = "Additional attributes (e.g. `policy` or `role`)"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit', 'XYZ')`"
-}
-
 variable "privileged_mode" {
   type        = bool
   default     = false
@@ -123,6 +96,12 @@ variable "github_token" {
   type        = string
   default     = ""
   description = "(Optional) GitHub auth token environment variable (`GITHUB_TOKEN`)"
+}
+
+variable "github_token_type" {
+  type        = string
+  default     = "PARAMETER_STORE"
+  description = "Storage type of GITHUB_TOKEN environment variable (`PARAMETER_STORE`, `PLAINTEXT`, `SECRETS_MANAGER`)"
 }
 
 variable "aws_region" {
@@ -149,6 +128,21 @@ variable "image_tag" {
   description = "(Optional) Docker image tag in the ECR repository, e.g. 'latest'. Used as CodeBuild ENV variable when building Docker images. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html"
 }
 
+variable "secondary_sources" {
+  type = list(object(
+    {
+      git_clone_depth     = number
+      location            = string
+      source_identifier   = string
+      type                = string
+      fetch_submodules    = bool
+      insecure_ssl        = bool
+      report_build_status = bool
+  }))
+  default     = []
+  description = "(Optional) secondary source for the codebuild project in addition to the primary location"
+}
+
 variable "source_type" {
   type        = string
   default     = "CODEPIPELINE"
@@ -165,6 +159,30 @@ variable "artifact_type" {
   type        = string
   default     = "CODEPIPELINE"
   description = "The build output artifact's type. Valid values for this parameter are: CODEPIPELINE, NO_ARTIFACTS or S3"
+}
+
+variable "artifact_location" {
+  type        = string
+  default     = ""
+  description = "Location of artifact. Applies only for artifact of type S3"
+}
+
+variable "secondary_artifact_location" {
+  type        = string
+  default     = null
+  description = "Location of secondary artifact. Must be an S3 reference"
+}
+
+variable "secondary_artifact_identifier" {
+  type        = string
+  default     = null
+  description = "Secondary artifact identifier. Must match the identifier in the build spec"
+}
+
+variable "secondary_artifact_encryption_enabled" {
+  type        = bool
+  default     = false
+  description = "Set to true to enable encryption on the secondary artifact bucket"
 }
 
 variable "report_build_status" {
@@ -221,6 +239,7 @@ variable "fetch_git_submodules" {
   description = "If set to true, fetches Git submodules for the AWS CodeBuild build project."
 }
 
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project#vpc_config
 variable "vpc_config" {
   type        = any
   default     = {}
@@ -234,7 +253,25 @@ variable "logs_config" {
 }
 
 variable "extra_permissions" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
+}
+
+variable "encryption_enabled" {
+  type        = bool
+  default     = false
+  description = "When set to 'true' the resource will have AES256 encryption enabled by default"
+}
+
+variable "versioning_enabled" {
+  type        = bool
+  default     = true
+  description = "A state of versioning. Versioning is a means of keeping multiple variants of an object in the same bucket"
+}
+
+variable "access_log_bucket_name" {
+  type        = string
+  default     = ""
+  description = "Name of the S3 bucket where s3 access log will be sent to"
 }

@@ -5,12 +5,14 @@ resource "aws_ecr_repository" "ecr_repo" {
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
+
+  tags = ["example"]
 }
 
 resource "aws_ecr_lifecycle_policy" "lifecycle" {
-  count = var.life_cycle_policy ? 1 : 0
+  count      = var.life_cycle_policy ? 1 : 0
   repository = aws_ecr_repository.ecr_repo.name
-  policy = <<EOF
+  policy     = <<EOF
 {
     "rules": [
         {
@@ -18,7 +20,7 @@ resource "aws_ecr_lifecycle_policy" "lifecycle" {
             "description": "Keep last ${var.keep_tagged_last_n_images} images",
             "selection": {
                 "tagStatus": "tagged",
-                "tagPrefixList": ["${join("\",\"",local.tagPrefixList)}"],
+                "tagPrefixList": ["${join("\",\"", local.tagPrefixList)}"],
                 "countType": "imageCountMoreThan",
                 "countNumber": ${var.keep_tagged_last_n_images}
             },
