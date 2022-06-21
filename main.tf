@@ -341,10 +341,11 @@ resource "aws_codebuild_project" "default" {
   }
 
   environment {
-    compute_type    = var.build_compute_type
-    image           = var.build_image
-    type            = var.build_type
-    privileged_mode = var.privileged_mode
+    compute_type                = var.build_compute_type
+    image                       = var.build_image
+    image_pull_credentials_type = var.build_image_pull_credentials_type
+    type                        = var.build_type
+    privileged_mode             = var.privileged_mode
 
     environment_variable {
       name  = "AWS_REGION"
