@@ -1,8 +1,6 @@
-data "aws_caller_identity" "default" {
-}
+data "aws_caller_identity" "default" {}
 
-data "aws_region" "default" {
-}
+data "aws_region" "default" {}
 
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
@@ -125,15 +123,16 @@ resource "aws_iam_policy" "default" {
   name   = module.this.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.combined_permissions.json
+  tags   = module.this.tags
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
-
   name   = "${module.this.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
+  tags   = module.this.tags
 }
 
 data "aws_s3_bucket" "secondary_artifact" {
@@ -467,6 +466,17 @@ resource "aws_codebuild_project" "default" {
           encryption_disabled = lookup(s3_logs.value, "encryption_disabled", null)
         }
       }
+    }
+  }
+
+  dynamic "file_system_locations" {
+    for_each = length(var.file_system_locations) > 0 ? [""] : []
+    content {
+      identifier    = lookup(file_system_locations.value, "identifier", null)
+      location      = lookup(file_system_locations.value, "location", null)
+      mount_options = lookup(file_system_locations.value, "mount_options", null)
+      mount_point   = lookup(file_system_locations.value, "mount_point", null)
+      type          = lookup(file_system_locations.value, "type", null)
     }
   }
 }

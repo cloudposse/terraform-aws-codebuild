@@ -4,14 +4,16 @@ variable "environment_variables" {
       name  = string
       value = string
       type  = string
-  }))
+    }
+  ))
 
   default = [
     {
       name  = "NO_ADDITIONAL_BUILD_VARS"
       value = "TRUE"
       type  = "PLAINTEXT"
-  }]
+    }
+  ]
 
   description = "A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER_STORE', or 'SECRETS_MANAGER'"
 }
@@ -274,4 +276,10 @@ variable "access_log_bucket_name" {
   type        = string
   default     = ""
   description = "Name of the S3 bucket where s3 access log will be sent to"
+}
+
+variable "file_system_locations" {
+  type        = any
+  default     = {}
+  description = "A set of file system locations to to mount inside the build. File system locations are documented below."
 }
