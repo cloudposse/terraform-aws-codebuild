@@ -97,43 +97,47 @@ Include this module in your existing terraform code:
 
 ```hcl
 module "build" {
-    source = "cloudposse/codebuild/aws"
-    # Cloud Posse recommends pinning every module to a specific version
-    # version     = "x.x.x"
-    namespace           = "eg"
-    stage               = "staging"
-    name                = "app"
+  source = "cloudposse/codebuild/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+  namespace           = "eg"
+  stage               = "staging"
+  name                = "app"
 
-    # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
-    build_image         = "aws/codebuild/standard:2.0"
-    build_compute_type  = "BUILD_GENERAL1_SMALL"
-    build_timeout       = 60
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
+  build_image         = "aws/codebuild/standard:2.0"
+  build_compute_type  = "BUILD_GENERAL1_SMALL"
+  build_timeout       = 60
 
-    # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
-    # For more info:
-    # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
-    # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
+  # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
+  # For more info:
+  # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
+  # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
 
-    privileged_mode     = true
-    aws_region          = "us-east-1"
-    aws_account_id      = "xxxxxxxxxx"
-    image_repo_name     = "ecr-repo-name"
-    image_tag           = "latest"
+  privileged_mode     = true
+  aws_region          = "us-east-1"
+  aws_account_id      = "xxxxxxxxxx"
+  image_repo_name     = "ecr-repo-name"
+  image_tag           = "latest"
 
-    # Optional extra environment variables
-    environment_variables = [{
-        name  = "JENKINS_URL"
-        value = "https://jenkins.example.com"
-      },
-      {
-        name  = "COMPANY_NAME"
-        value = "Amazon"
-      },
-      {
-        name = "TIME_ZONE"
-        value = "Pacific/Auckland"
-
-      }]
+  # Optional extra environment variables
+  environment_variables = [
+    {
+      name  = "JENKINS_URL"
+      value = "https://jenkins.example.com"
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "COMPANY_NAME"
+      value = "Amazon"
+      type  = "PLAINTEXT"
+    },
+    {
+      name = "TIME_ZONE"
+      value = "Pacific/Auckland"
+      type  = "PLAINTEXT"
+    }
+  ]
 }
 ```
 
@@ -212,6 +216,7 @@ Available targets:
 | <a name="input_badge_enabled"></a> [badge\_enabled](#input\_badge\_enabled) | Generates a publicly-accessible URL for the projects build badge. Available as badge\_url attribute when enabled | `bool` | `false` | no |
 | <a name="input_build_compute_type"></a> [build\_compute\_type](#input\_build\_compute\_type) | Instance type of the build instance | `string` | `"BUILD_GENERAL1_SMALL"` | no |
 | <a name="input_build_image"></a> [build\_image](#input\_build\_image) | Docker image for build environment, e.g. 'aws/codebuild/standard:2.0' or 'aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0'. For more info: http://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref.html | `string` | `"aws/codebuild/standard:2.0"` | no |
+| <a name="input_build_image_pull_credentials_type"></a> [build\_image\_pull\_credentials\_type](#input\_build\_image\_pull\_credentials\_type) | Type of credentials AWS CodeBuild uses to pull images in your build.Valid values: CODEBUILD, SERVICE\_ROLE. When you use a cross-account or private registry image, you must use SERVICE\_ROLE credentials. | `string` | `"CODEBUILD"` | no |
 | <a name="input_build_timeout"></a> [build\_timeout](#input\_build\_timeout) | How long in minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed | `number` | `60` | no |
 | <a name="input_build_type"></a> [build\_type](#input\_build\_type) | The type of build environment, e.g. 'LINUX\_CONTAINER' or 'WINDOWS\_CONTAINER' | `string` | `"LINUX_CONTAINER"` | no |
 | <a name="input_buildspec"></a> [buildspec](#input\_buildspec) | Optional buildspec declaration to use for building the project | `string` | `""` | no |
@@ -225,10 +230,12 @@ Available targets:
 | <a name="input_descriptor_formats"></a> [descriptor\_formats](#input\_descriptor\_formats) | Describe additional descriptors to be output in the `descriptors` output map.<br>Map of maps. Keys are names of descriptors. Values are maps of the form<br>`{<br>   format = string<br>   labels = list(string)<br>}`<br>(Type is `any` so the map values can later be enhanced to provide additional options.)<br>`format` is a Terraform format string to be passed to the `format()` function.<br>`labels` is a list of labels, in order, to pass to `format()` function.<br>Label values will be normalized before being passed to `format()` so they will be<br>identical to how they appear in `id`.<br>Default is `{}` (`descriptors` output will be empty). | `any` | `{}` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | <a name="input_encryption_enabled"></a> [encryption\_enabled](#input\_encryption\_enabled) | When set to 'true' the resource will have AES256 encryption enabled by default | `bool` | `false` | no |
+| <a name="input_encryption_key"></a> [encryption\_key](#input\_encryption\_key) | AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | ID element. Usually used for region e.g. 'uw2', 'us-west-2', OR role 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
-| <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER\_STORE', or 'SECRETS\_MANAGER' | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>      type  = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "type": "PLAINTEXT",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
+| <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER\_STORE', or 'SECRETS\_MANAGER' | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>      type  = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "type": "PLAINTEXT",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
 | <a name="input_extra_permissions"></a> [extra\_permissions](#input\_extra\_permissions) | List of action strings which will be added to IAM service account permissions. | `list(any)` | `[]` | no |
 | <a name="input_fetch_git_submodules"></a> [fetch\_git\_submodules](#input\_fetch\_git\_submodules) | If set to true, fetches Git submodules for the AWS CodeBuild build project. | `bool` | `false` | no |
+| <a name="input_file_system_locations"></a> [file\_system\_locations](#input\_file\_system\_locations) | A set of file system locations to to mount inside the build. File system locations are documented below. | `any` | `{}` | no |
 | <a name="input_git_clone_depth"></a> [git\_clone\_depth](#input\_git\_clone\_depth) | Truncate git history to this many commits. | `number` | `null` | no |
 | <a name="input_github_token"></a> [github\_token](#input\_github\_token) | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`) | `string` | `""` | no |
 | <a name="input_github_token_type"></a> [github\_token\_type](#input\_github\_token\_type) | Storage type of GITHUB\_TOKEN environment variable (`PARAMETER_STORE`, `PLAINTEXT`, `SECRETS_MANAGER`) | `string` | `"PARAMETER_STORE"` | no |
@@ -247,6 +254,7 @@ Available targets:
 | <a name="input_privileged_mode"></a> [privileged\_mode](#input\_privileged\_mode) | (Optional) If set to true, enables running the Docker daemon inside a Docker container on the CodeBuild instance. Used when building Docker images | `bool` | `false` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br>Characters matching the regex will be removed from the ID elements.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_report_build_status"></a> [report\_build\_status](#input\_report\_build\_status) | Set to true to report the status of a build's start and finish to your source provider. This option is only valid when the source\_type is BITBUCKET or GITHUB | `bool` | `false` | no |
+| <a name="input_s3_cache_bucket_name"></a> [s3\_cache\_bucket\_name](#input\_s3\_cache\_bucket\_name) | Use an existing s3 bucket name for cache. Relevant if `cache_type` is set to `S3`. | `string` | `null` | no |
 | <a name="input_secondary_artifact_encryption_enabled"></a> [secondary\_artifact\_encryption\_enabled](#input\_secondary\_artifact\_encryption\_enabled) | Set to true to enable encryption on the secondary artifact bucket | `bool` | `false` | no |
 | <a name="input_secondary_artifact_identifier"></a> [secondary\_artifact\_identifier](#input\_secondary\_artifact\_identifier) | Secondary artifact identifier. Must match the identifier in the build spec | `string` | `null` | no |
 | <a name="input_secondary_artifact_location"></a> [secondary\_artifact\_location](#input\_secondary\_artifact\_location) | Location of secondary artifact. Must be an S3 reference | `string` | `null` | no |

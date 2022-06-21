@@ -1,14 +1,12 @@
-data "aws_caller_identity" "default" {
-}
+data "aws_caller_identity" "default" {}
 
-data "aws_region" "default" {
-}
+data "aws_region" "default" {}
 
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
-  count         = module.this.enabled && local.s3_cache_enabled ? 1 : 0
+  count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
   acl           = "private"
   force_destroy = true
@@ -71,7 +69,9 @@ locals {
     min(length(local.cache_bucket_name), 63),
   )
 
-  s3_cache_enabled = var.cache_type == "S3"
+  s3_cache_enabled       = var.cache_type == "S3"
+  create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
+  s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket.*.bucket) : var.s3_cache_bucket_name
 
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
@@ -79,8 +79,7 @@ locals {
   cache_options = {
     "S3" = {
       type     = "S3"
-      location = module.this.enabled && local.s3_cache_enabled ? join("", aws_s3_bucket.cache_bucket.*.bucket) : "none"
-
+      location = module.this.enabled && local.s3_cache_enabled ? local.s3_bucket_name : "none"
     },
     "LOCAL" = {
       type  = "LOCAL"
@@ -125,15 +124,16 @@ resource "aws_iam_policy" "default" {
   name   = module.this.id
   path   = "/service-role/"
   policy = data.aws_iam_policy_document.combined_permissions.json
+  tags   = module.this.tags
 }
 
 resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
-
   name   = "${module.this.id}-cache-bucket"
   path   = "/service-role/"
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
+  tags   = module.this.tags
 }
 
 data "aws_s3_bucket" "secondary_artifact" {
@@ -298,6 +298,8 @@ resource "aws_codebuild_project" "default" {
   badge_enabled          = var.badge_enabled
   build_timeout          = var.build_timeout
   source_version         = var.source_version != "" ? var.source_version : null
+  encryption_key         = var.encryption_key
+
   tags = {
     for name, value in module.this.tags :
     name => value
@@ -340,10 +342,11 @@ resource "aws_codebuild_project" "default" {
   }
 
   environment {
-    compute_type    = var.build_compute_type
-    image           = var.build_image
-    type            = var.build_type
-    privileged_mode = var.privileged_mode
+    compute_type                = var.build_compute_type
+    image                       = var.build_image
+    image_pull_credentials_type = var.build_image_pull_credentials_type
+    type                        = var.build_type
+    privileged_mode             = var.privileged_mode
 
     environment_variable {
       name  = "AWS_REGION"
@@ -467,6 +470,17 @@ resource "aws_codebuild_project" "default" {
           encryption_disabled = lookup(s3_logs.value, "encryption_disabled", null)
         }
       }
+    }
+  }
+
+  dynamic "file_system_locations" {
+    for_each = length(var.file_system_locations) > 0 ? [""] : []
+    content {
+      identifier    = lookup(file_system_locations.value, "identifier", null)
+      location      = lookup(file_system_locations.value, "location", null)
+      mount_options = lookup(file_system_locations.value, "mount_options", null)
+      mount_point   = lookup(file_system_locations.value, "mount_point", null)
+      type          = lookup(file_system_locations.value, "type", null)
     }
   }
 }

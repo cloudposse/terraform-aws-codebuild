@@ -4,14 +4,16 @@ variable "environment_variables" {
       name  = string
       value = string
       type  = string
-  }))
+    }
+  ))
 
   default = [
     {
       name  = "NO_ADDITIONAL_BUILD_VARS"
       value = "TRUE"
       type  = "PLAINTEXT"
-  }]
+    }
+  ]
 
   description = "A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER_STORE', or 'SECRETS_MANAGER'"
 }
@@ -274,4 +276,28 @@ variable "access_log_bucket_name" {
   type        = string
   default     = ""
   description = "Name of the S3 bucket where s3 access log will be sent to"
+}
+
+variable "file_system_locations" {
+  type        = any
+  default     = {}
+  description = "A set of file system locations to to mount inside the build. File system locations are documented below."
+}
+
+variable "encryption_key" {
+  type        = string
+  default     = null
+  description = "AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts."
+}
+
+variable "build_image_pull_credentials_type" {
+  type        = string
+  default     = "CODEBUILD"
+  description = "Type of credentials AWS CodeBuild uses to pull images in your build.Valid values: CODEBUILD, SERVICE_ROLE. When you use a cross-account or private registry image, you must use SERVICE_ROLE credentials."
+}
+
+variable "s3_cache_bucket_name" {
+  type        = string
+  default     = null
+  description = "Use an existing s3 bucket name for cache. Relevant if `cache_type` is set to `S3`."
 }
