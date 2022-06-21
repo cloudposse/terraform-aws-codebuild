@@ -97,43 +97,47 @@ Include this module in your existing terraform code:
 
 ```hcl
 module "build" {
-    source = "cloudposse/codebuild/aws"
-    # Cloud Posse recommends pinning every module to a specific version
-    # version     = "x.x.x"
-    namespace           = "eg"
-    stage               = "staging"
-    name                = "app"
+  source = "cloudposse/codebuild/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version     = "x.x.x"
+  namespace           = "eg"
+  stage               = "staging"
+  name                = "app"
 
-    # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
-    build_image         = "aws/codebuild/standard:2.0"
-    build_compute_type  = "BUILD_GENERAL1_SMALL"
-    build_timeout       = 60
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
+  build_image         = "aws/codebuild/standard:2.0"
+  build_compute_type  = "BUILD_GENERAL1_SMALL"
+  build_timeout       = 60
 
-    # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
-    # For more info:
-    # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
-    # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
+  # These attributes are optional, used as ENV variables when building Docker images and pushing them to ECR
+  # For more info:
+  # http://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
+  # https://www.terraform.io/docs/providers/aws/r/codebuild_project.html
 
-    privileged_mode     = true
-    aws_region          = "us-east-1"
-    aws_account_id      = "xxxxxxxxxx"
-    image_repo_name     = "ecr-repo-name"
-    image_tag           = "latest"
+  privileged_mode     = true
+  aws_region          = "us-east-1"
+  aws_account_id      = "xxxxxxxxxx"
+  image_repo_name     = "ecr-repo-name"
+  image_tag           = "latest"
 
-    # Optional extra environment variables
-    environment_variables = [{
-        name  = "JENKINS_URL"
-        value = "https://jenkins.example.com"
-      },
-      {
-        name  = "COMPANY_NAME"
-        value = "Amazon"
-      },
-      {
-        name = "TIME_ZONE"
-        value = "Pacific/Auckland"
-
-      }]
+  # Optional extra environment variables
+  environment_variables = [
+    {
+      name  = "JENKINS_URL"
+      value = "https://jenkins.example.com"
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "COMPANY_NAME"
+      value = "Amazon"
+      type  = "PLAINTEXT"
+    },
+    {
+      name = "TIME_ZONE"
+      value = "Pacific/Auckland"
+      type  = "PLAINTEXT"
+    }
+  ]
 }
 ```
 
@@ -226,9 +230,10 @@ Available targets:
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | <a name="input_encryption_enabled"></a> [encryption\_enabled](#input\_encryption\_enabled) | When set to 'true' the resource will have AES256 encryption enabled by default | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | ID element. Usually used for region e.g. 'uw2', 'us-west-2', OR role 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
-| <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER\_STORE', or 'SECRETS\_MANAGER' | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>      type  = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "type": "PLAINTEXT",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
+| <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | A list of maps, that contain the keys 'name', 'value', and 'type' to be used as additional environment variables for the build. Valid types are 'PLAINTEXT', 'PARAMETER\_STORE', or 'SECRETS\_MANAGER' | <pre>list(object(<br>    {<br>      name  = string<br>      value = string<br>      type  = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "NO_ADDITIONAL_BUILD_VARS",<br>    "type": "PLAINTEXT",<br>    "value": "TRUE"<br>  }<br>]</pre> | no |
 | <a name="input_extra_permissions"></a> [extra\_permissions](#input\_extra\_permissions) | List of action strings which will be added to IAM service account permissions. | `list(any)` | `[]` | no |
 | <a name="input_fetch_git_submodules"></a> [fetch\_git\_submodules](#input\_fetch\_git\_submodules) | If set to true, fetches Git submodules for the AWS CodeBuild build project. | `bool` | `false` | no |
+| <a name="input_file_system_locations"></a> [file\_system\_locations](#input\_file\_system\_locations) | A set of file system locations to to mount inside the build. File system locations are documented below. | `any` | `{}` | no |
 | <a name="input_git_clone_depth"></a> [git\_clone\_depth](#input\_git\_clone\_depth) | Truncate git history to this many commits. | `number` | `null` | no |
 | <a name="input_github_token"></a> [github\_token](#input\_github\_token) | (Optional) GitHub auth token environment variable (`GITHUB_TOKEN`) | `string` | `""` | no |
 | <a name="input_github_token_type"></a> [github\_token\_type](#input\_github\_token\_type) | Storage type of GITHUB\_TOKEN environment variable (`PARAMETER_STORE`, `PLAINTEXT`, `SECRETS_MANAGER`) | `string` | `"PARAMETER_STORE"` | no |
