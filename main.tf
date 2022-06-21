@@ -99,6 +99,8 @@ resource "aws_iam_role" "default" {
   name                  = module.this.id
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
+  path                  = var.iam_role_path
+  permissions_boundary  = var.iam_permissions_boundary
   tags                  = module.this.tags
 }
 
@@ -122,7 +124,7 @@ data "aws_iam_policy_document" "role" {
 resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
   name   = module.this.id
-  path   = "/service-role/"
+  path   = var.iam_policy_path
   policy = data.aws_iam_policy_document.combined_permissions.json
   tags   = module.this.tags
 }
@@ -131,7 +133,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
   name   = "${module.this.id}-cache-bucket"
-  path   = "/service-role/"
+  path   = var.iam_policy_path
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
   tags   = module.this.tags
 }
