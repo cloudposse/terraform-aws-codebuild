@@ -297,6 +297,8 @@ resource "aws_codebuild_project" "default" {
   badge_enabled          = var.badge_enabled
   build_timeout          = var.build_timeout
   source_version         = var.source_version != "" ? var.source_version : null
+  encryption_key         = var.encryption_key
+
   tags = {
     for name, value in module.this.tags :
     name => value

@@ -283,3 +283,9 @@ variable "file_system_locations" {
   default     = {}
   description = "A set of file system locations to to mount inside the build. File system locations are documented below."
 }
+
+variable "encryption_key" {
+  type        = string
+  default     = null
+  description = "AWS Key Management Service (AWS KMS) customer master key (CMK) to be used for encrypting the build project's build output artifacts."
+}
