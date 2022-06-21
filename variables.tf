@@ -295,3 +295,9 @@ variable "build_image_pull_credentials_type" {
   default     = "CODEBUILD"
   description = "Type of credentials AWS CodeBuild uses to pull images in your build.Valid values: CODEBUILD, SERVICE_ROLE. When you use a cross-account or private registry image, you must use SERVICE_ROLE credentials."
 }
+
+variable "s3_cache_bucket_name" {
+  type        = string
+  default     = null
+  description = "Use an existing s3 bucket name for cache. Relevant if `cache_type` is set to `S3`."
+}
