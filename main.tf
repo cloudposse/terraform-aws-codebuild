@@ -70,7 +70,7 @@ locals {
   )
 
   s3_cache_enabled       = var.cache_type == "S3"
-  create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == ""
+  create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
   s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket.*.bucket) : var.s3_cache_bucket_name
 
   ## This is the magic where a map of a list of maps is generated
