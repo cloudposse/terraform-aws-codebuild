@@ -171,8 +171,8 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.21.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.21.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.1 |
 
 ## Modules
 
