@@ -38,7 +38,7 @@ module "cache_bucket" {
       }
     }
   ]
-  bucket_key_enabled = true
+  bucket_key_enabled = var.encryption_enabled
 }
 resource "random_string" "bucket_prefix" {
   count   = module.this.enabled ? 1 : 0
