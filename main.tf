@@ -52,7 +52,7 @@ resource "aws_s3_bucket" "cache_bucket" {
 resource "random_string" "bucket_prefix" {
   count   = module.this.enabled ? 1 : 0
   length  = 12
-  number  = false
+  numeric = false
   upper   = false
   special = false
   lower   = true
