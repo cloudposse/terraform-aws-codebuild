@@ -288,7 +288,7 @@ variable "logs_config" {
 }
 
 variable "extra_permissions" {
-  type        = list(any)
+  type        = list(string)
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
 }

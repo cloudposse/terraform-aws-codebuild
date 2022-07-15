@@ -12,7 +12,6 @@ module "cache_bucket" {
   count       = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket_name = local.cache_bucket_name_normalised
 
-  acl                = true
   force_destroy      = true
   tags               = module.this.tags
   versioning_enabled = var.versioning_enabled
@@ -26,7 +25,6 @@ module "cache_bucket" {
       enabled                                = true
       id                                     = "codebuildcache"
       abort_incomplete_multipart_upload_days = 1
-      prefix                                 = "/"
       tags                                   = module.this.tags
       filter_and                             = {}
       noncurrent_version_expiration          = {}
