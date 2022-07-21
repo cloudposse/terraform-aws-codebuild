@@ -1,6 +1,7 @@
 variable "region" {
   type        = string
-  description = "AWS region"
+  default     = ""
+  description = "If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee"
 }
 
 variable "environment_variables" {
