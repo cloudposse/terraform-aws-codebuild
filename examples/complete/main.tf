@@ -2,6 +2,10 @@ provider "aws" {
   region = var.region
 }
 
+provider "awsutils" {
+  region = var.region
+}
+
 module "codebuild" {
   source                      = "../../"
   description                 = "This is my awesome CodeBuild project"

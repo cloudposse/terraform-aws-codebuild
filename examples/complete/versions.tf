@@ -10,5 +10,9 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 2.1"
     }
+    awsutils = {
+      source  = "cloudposse/awsutils"
+      version = ">= 0.11.0"
+    }
   }
 }
