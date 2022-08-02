@@ -20,7 +20,7 @@ output "role_arn" {
 
 output "cache_bucket_name" {
   description = "Cache S3 bucket name"
-  value       = module.this.enabled && local.s3_cache_enabled ? join("", module.cache_bucket.*.bucket) : "UNSET"
+  value       = module.this.enabled && local.s3_cache_enabled ? join("", module.cache_bucket.*.bucket_id) : "UNSET"
 }
 
 output "cache_bucket_arn" {
