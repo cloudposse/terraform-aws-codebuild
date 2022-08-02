@@ -60,7 +60,7 @@ locals {
 
   s3_cache_enabled       = var.cache_type == "S3"
   create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
-  s3_bucket_name         = local.create_s3_cache_bucket ? join("", module.cache_bucket.*.bucket) : var.s3_cache_bucket_name
+  s3_bucket_name         = local.create_s3_cache_bucket ? join("", module.cache_bucket.*.bucket_id) : var.s3_cache_bucket_name
 
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
@@ -314,7 +314,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = !var.secondary_artifact_encryption_enabled
+      encryption_disabled = ! var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
