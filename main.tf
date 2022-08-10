@@ -15,10 +15,10 @@ module "cache_bucket" {
   force_destroy      = true
   tags               = module.this.tags
   versioning_enabled = var.versioning_enabled
-  logging = {
+  logging = var.access_log_bucket_name != "" ? {
     bucket_name = var.access_log_bucket_name
     prefix      = "logs/${module.this.id}/"
-  }
+  } : null
   lifecycle_configuration_rules = [
     # Be sure to cover https://github.com/cloudposse/terraform-aws-s3-bucket/issues/137
     {
