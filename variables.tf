@@ -79,7 +79,7 @@ variable "build_timeout" {
 variable "build_type" {
   type        = string
   default     = "LINUX_CONTAINER"
-  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER'"
+  description = "The type of build environment, e.g. 'LINUX_CONTAINER' or 'WINDOWS_CONTAINER' or 'ARM_CONTAINER'"
 }
 
 variable "buildspec" {
