@@ -102,6 +102,21 @@ resource "aws_iam_role" "default" {
   path                  = var.iam_role_path
   permissions_boundary  = var.iam_permissions_boundary
   tags                  = module.this.tags
+
+
+  dynamic "build_batch_config" {
+    for_each = var.concurrent_build_limit == 1 ? [] : [1]
+    content {
+      combine_artifacts = "true"
+      service_role      = join("", aws_iam_role.default.*.arn)
+      timeout_in_mins   = 30
+      restrictions {
+        // todo, tune based on needs
+        maximum_builds_allowed = 100
+      }
+    }
+  }
+
 }
 
 data "aws_iam_policy_document" "role" {
