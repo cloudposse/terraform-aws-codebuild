@@ -102,21 +102,6 @@ resource "aws_iam_role" "default" {
   path                  = var.iam_role_path
   permissions_boundary  = var.iam_permissions_boundary
   tags                  = module.this.tags
-
-
-  dynamic "build_batch_config" {
-    for_each = var.concurrent_build_limit == 1 ? [] : [1]
-    content {
-      combine_artifacts = "true"
-      service_role      = join("", aws_iam_role.default.*.arn)
-      timeout_in_mins   = 30
-      restrictions {
-        // todo, tune based on needs
-        maximum_builds_allowed = 100
-      }
-    }
-  }
-
 }
 
 data "aws_iam_policy_document" "role" {
@@ -328,6 +313,21 @@ resource "aws_codebuild_project" "default" {
     location = var.artifact_location
   }
 
+
+
+  dynamic "build_batch_config" {
+    for_each = var.concurrent_build_limit == 1 ? [] : [1]
+    content {
+      combine_artifacts = "true"
+      service_role      = join("", aws_iam_role.default.*.arn)
+      timeout_in_mins   = 30
+      restrictions {
+        // todo, tune based on needs
+        maximum_builds_allowed = 100
+      }
+    }
+  }
+
   # Since the output type is restricted to S3 by the provider (this appears to
   # be an bug in AWS, rather than an architectural decision; see this issue for
   # discussion: https://github.com/hashicorp/terraform-provider-aws/pull/9652),
@@ -340,7 +340,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
