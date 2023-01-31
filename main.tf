@@ -313,17 +313,15 @@ resource "aws_codebuild_project" "default" {
     location = var.artifact_location
   }
 
-
-
   dynamic "build_batch_config" {
-    for_each = var.batch_builds_limit == 1 ? [] : [1]
+    for_each = var.batch_build_limit == 1 ? [] : [1]
     content {
       combine_artifacts = "true"
       service_role      = join("", aws_iam_role.default.*.arn)
       timeout_in_mins   = 30
       restrictions {
         // todo, tune based on needs
-        maximum_builds_allowed = var.batch_builds_limit
+        maximum_builds_allowed = var.batch_build_limit
       }
     }
   }
