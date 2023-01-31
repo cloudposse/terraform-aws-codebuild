@@ -26,8 +26,14 @@ variable "description" {
 
 variable "concurrent_build_limit" {
   type        = number
-  default     = 1
+  default     = null
   description = "Specify a maximum number of concurrent builds for the project. The value specified must be greater than 0 and less than the account concurrent running builds limit."
+}
+
+variable "batch_builds_limit" {
+  type        = number
+  default     = 1
+  description = "Specify a maximum number of concurrent batch builds for project/stage. 1 means that batching is disabled"
 }
 
 variable "cache_expiration_days" {

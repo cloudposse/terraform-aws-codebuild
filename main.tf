@@ -316,14 +316,14 @@ resource "aws_codebuild_project" "default" {
 
 
   dynamic "build_batch_config" {
-    for_each = var.concurrent_build_limit == 1 ? [] : [1]
+    for_each = var.batch_builds_limit == 1 ? [] : [1]
     content {
       combine_artifacts = "true"
       service_role      = join("", aws_iam_role.default.*.arn)
       timeout_in_mins   = 30
       restrictions {
         // todo, tune based on needs
-        maximum_builds_allowed = 100
+        maximum_builds_allowed = var.batch_builds_limit
       }
     }
   }
