@@ -33,7 +33,7 @@ variable "concurrent_build_limit" {
 variable "batch_build_limit" {
   type        = number
   default     = null
-  description = "Specify a maximum number of concurrent batch builds for project/stage. 1 means that batching is disabled"
+  description = "Specify a maximum number of concurrent batch builds. null means that batching is disabled"
 }
 
 variable "cache_expiration_days" {
