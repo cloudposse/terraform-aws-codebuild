@@ -320,7 +320,6 @@ resource "aws_codebuild_project" "default" {
       service_role      = join("", aws_iam_role.default.*.arn)
       timeout_in_mins   = 30
       restrictions {
-        // todo, tune based on needs
         maximum_builds_allowed = var.batch_build_limit
       }
     }
