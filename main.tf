@@ -138,6 +138,15 @@ resource "aws_iam_policy" "default_cache_bucket" {
   tags   = module.this.tags
 }
 
+resource "aws_iam_policy" "default_batch_policy" {
+  count = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+
+  name   = "${module.this.id}-batch-permissions"
+  path   = var.iam_policy_path
+  policy = join("", data.aws_iam_policy_document.batch_permissions.*.json)
+  tags   = module.this.tags
+}
+
 data "aws_s3_bucket" "secondary_artifact" {
   count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
   bucket = var.secondary_artifact_location
@@ -246,6 +255,26 @@ data "aws_iam_policy_document" "vpc_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "batch_permissions" {
+  count = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+  statement {
+    sid = ""
+
+    actions = [
+      "codebuild:BatchGetBuilds",
+      "codebuild:BatchGetBuildBatches",
+      "codebuild:StartBuildBatch",
+      "codebuild:StartBuild"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
     join("", data.aws_iam_policy_document.permissions.*.json),
@@ -283,6 +312,12 @@ resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   role       = join("", aws_iam_role.default.*.id)
 }
 
+resource "aws_iam_role_policy_attachment" "default_batch_permissions" {
+  count      = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+  policy_arn = join("", aws_iam_policy.default_batch_policy.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
+}
+
 resource "aws_codebuild_source_credential" "authorization" {
   count       = module.this.enabled && var.private_repository ? 1 : 0
   auth_type   = var.source_credential_auth_type
@@ -313,6 +348,17 @@ resource "aws_codebuild_project" "default" {
     location = var.artifact_location
   }
 
+  dynamic "build_batch_config" {
+    for_each = var.batch_build_limit == null ? [] : [1]
+    content {
+      combine_artifacts = "true"
+      service_role      = join("", aws_iam_role.default.*.arn)
+      restrictions {
+        maximum_builds_allowed = var.batch_build_limit
+      }
+    }
+  }
+
   # Since the output type is restricted to S3 by the provider (this appears to
   # be an bug in AWS, rather than an architectural decision; see this issue for
   # discussion: https://github.com/hashicorp/terraform-provider-aws/pull/9652),
@@ -325,7 +371,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be

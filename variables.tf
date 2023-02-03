@@ -30,6 +30,12 @@ variable "concurrent_build_limit" {
   description = "Specify a maximum number of concurrent builds for the project. The value specified must be greater than 0 and less than the account concurrent running builds limit."
 }
 
+variable "batch_build_limit" {
+  type        = number
+  default     = null
+  description = "Specify a maximum number of concurrent batch builds. null means that batching is disabled"
+}
+
 variable "cache_expiration_days" {
   default     = 7
   description = "How many days should the build cache be kept. It only works when cache_type is 'S3'"
