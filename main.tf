@@ -353,7 +353,6 @@ resource "aws_codebuild_project" "default" {
     content {
       combine_artifacts = "true"
       service_role      = join("", aws_iam_role.default.*.arn)
-      timeout_in_mins   = 30
       restrictions {
         maximum_builds_allowed = var.batch_build_limit
       }
