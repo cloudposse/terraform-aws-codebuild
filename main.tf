@@ -138,6 +138,15 @@ resource "aws_iam_policy" "default_cache_bucket" {
   tags   = module.this.tags
 }
 
+resource "aws_iam_policy" "default_batch_policy" {
+  count = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+
+  name   = "${module.this.id}-batch-permissions"
+  path   = var.iam_policy_path
+  policy = join("", data.aws_iam_policy_document.batch_permissions.*.json)
+  tags   = module.this.tags
+}
+
 data "aws_s3_bucket" "secondary_artifact" {
   count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
   bucket = var.secondary_artifact_location
@@ -246,6 +255,26 @@ data "aws_iam_policy_document" "vpc_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "batch_permissions" {
+  count = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+  statement {
+    sid = ""
+
+    actions = [
+      "codebuild:BatchGetBuilds",
+      "codebuild:BatchGetBuildBatches",
+      "codebuild:StartBuildBatch",
+      "codebuild:StartBuild"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
     join("", data.aws_iam_policy_document.permissions.*.json),
@@ -280,6 +309,12 @@ resource "aws_iam_role_policy_attachment" "default" {
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
   policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
+  role       = join("", aws_iam_role.default.*.id)
+}
+
+resource "aws_iam_role_policy_attachment" "default_batch_permissions" {
+  count      = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+  policy_arn = join("", aws_iam_policy.default_batch_policy.*.arn)
   role       = join("", aws_iam_role.default.*.id)
 }
 
