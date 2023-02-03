@@ -138,6 +138,15 @@ resource "aws_iam_policy" "default_cache_bucket" {
   tags   = module.this.tags
 }
 
+resource "aws_iam_policy" "default_batch_policy" {
+  count = module.this.enabled && var.batch_build_limit != null ? 1 : 0
+
+  name   = "${module.this.id}-batch-permissions"
+  path   = var.iam_policy_path
+  policy = join("", data.aws_iam_policy_document.batch_permissions.*.json)
+  tags   = module.this.tags
+}
+
 data "aws_s3_bucket" "secondary_artifact" {
   count  = module.this.enabled ? (var.secondary_artifact_location != null ? 1 : 0) : 0
   bucket = var.secondary_artifact_location
