@@ -288,13 +288,13 @@ variable "logs_config" {
 }
 
 variable "extra_permissions" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "List of action strings which will be added to IAM service account permissions."
 }
 
 # Log tracker
 variable "log_tracker" {
-  type    = map
+  type    = map(any)
   default = {}
 }
