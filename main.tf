@@ -8,7 +8,6 @@ resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
   count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
-  acl           = "private"
   force_destroy = true
   tags          = module.this.tags
 
@@ -47,6 +46,20 @@ resource "aws_s3_bucket" "cache_bucket" {
       }
     }
   }
+}
+
+resource "aws_s3_bucket_ownership_controls" "cache_bucket" {
+  bucket = aws_s3_bucket.cache_bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "cache_bucket" {
+  depends_on = [aws_s3_bucket_ownership_controls.cache_bucket]
+
+  bucket = aws_s3_bucket.cache_bucket.id
+  acl    = "private"
 }
 
 resource "random_string" "bucket_prefix" {
