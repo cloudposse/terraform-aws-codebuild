@@ -49,16 +49,20 @@ resource "aws_s3_bucket" "cache_bucket" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "cache_bucket" {
-  bucket = aws_s3_bucket.cache_bucket.id
+  count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  #bucket        = aws_s3_bucket.cache_bucket.id
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
 resource "aws_s3_bucket_acl" "cache_bucket" {
+  count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   depends_on = [aws_s3_bucket_ownership_controls.cache_bucket]
 
-  bucket = aws_s3_bucket.cache_bucket.id
+  #bucket = aws_s3_bucket.cache_bucket.id
+  bucket        = aws_s3_bucket.cache_bucket[count.index].id
   acl    = "private"
 }
 
