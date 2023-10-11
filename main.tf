@@ -50,7 +50,6 @@ resource "aws_s3_bucket" "cache_bucket" {
 
 resource "aws_s3_bucket_ownership_controls" "cache_bucket" {
   count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
-  #bucket        = aws_s3_bucket.cache_bucket.id
   bucket        = aws_s3_bucket.cache_bucket[count.index].id
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -61,7 +60,6 @@ resource "aws_s3_bucket_acl" "cache_bucket" {
   count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   depends_on = [aws_s3_bucket_ownership_controls.cache_bucket]
 
-  #bucket = aws_s3_bucket.cache_bucket.id
   bucket        = aws_s3_bucket.cache_bucket[count.index].id
   acl    = "private"
 }
@@ -473,14 +471,6 @@ resource "aws_codebuild_project" "default" {
     location            = var.source_location
     report_build_status = var.report_build_status
     git_clone_depth     = var.git_clone_depth != null ? var.git_clone_depth : null
-
-    # dynamic "auth" {
-    #   for_each = var.private_repository ? [""] : []
-    #   content {
-    #     type     = "OAUTH"
-    #     resource = join("", aws_codebuild_source_credential.authorization.*.id)
-    #   }
-    # }
 
     dynamic "git_submodules_config" {
       for_each = var.fetch_git_submodules ? [""] : []
