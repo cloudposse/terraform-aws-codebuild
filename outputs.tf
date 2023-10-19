@@ -37,3 +37,8 @@ output "project_arn" {
   description = "Project ARN"
   value       = join("", aws_codebuild_project.default.*.arn)
 }
+
+output "buildspec" {
+  description = "The buildspec used with the CodeBuild project"
+  value       = var.buildspec
+}

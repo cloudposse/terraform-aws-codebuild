@@ -319,3 +319,14 @@ variable "s3_cache_bucket_name" {
   default     = null
   description = "Use an existing s3 bucket name for cache. Relevant if `cache_type` is set to `S3`."
 }
+
+variable "codebuild_iam" {
+  description = "Additional IAM policies to add to CodePipeline IAM role."
+  type        = string
+  default     = null
+}
+
+variable "project_name" {
+  type        = string
+  description = "Name of the codebuild project."
+}

@@ -8,7 +8,6 @@ resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
   count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
-  acl           = "private"
   force_destroy = true
   tags          = module.this.tags
 
@@ -20,7 +19,7 @@ resource "aws_s3_bucket" "cache_bucket" {
     for_each = var.access_log_bucket_name != "" ? [1] : []
     content {
       target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
+      target_prefix = "logs/${var.project_name}/"
     }
   }
 
@@ -59,7 +58,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = "${var.project_name}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -96,11 +95,20 @@ locals {
 
 resource "aws_iam_role" "default" {
   count                 = module.this.enabled ? 1 : 0
-  name                  = module.this.id
+  name                  = var.project_name
   assume_role_policy    = data.aws_iam_policy_document.role.json
   force_detach_policies = true
   path                  = var.iam_role_path
   permissions_boundary  = var.iam_permissions_boundary
+
+  dynamic "inline_policy" {
+    for_each = var.codebuild_iam != null ? [1] : []
+    content {
+      name = var.project_name
+      policy = var.codebuild_iam
+    }
+  }
+
   tags                  = module.this.tags
 }
 
@@ -123,7 +131,7 @@ data "aws_iam_policy_document" "role" {
 
 resource "aws_iam_policy" "default" {
   count  = module.this.enabled ? 1 : 0
-  name   = module.this.id
+  name   = var.project_name
   path   = var.iam_policy_path
   policy = data.aws_iam_policy_document.combined_permissions.json
   tags   = module.this.tags
@@ -132,7 +140,7 @@ resource "aws_iam_policy" "default" {
 resource "aws_iam_policy" "default_cache_bucket" {
   count = module.this.enabled && local.s3_cache_enabled ? 1 : 0
 
-  name   = "${module.this.id}-cache-bucket"
+  name   = "${var.project_name}-cache-bucket"
   path   = var.iam_policy_path
   policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
   tags   = module.this.tags
@@ -150,20 +158,10 @@ data "aws_iam_policy_document" "permissions" {
     sid = ""
 
     actions = compact(concat([
-      "codecommit:GitPull",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:CompleteLayerUpload",
-      "ecr:GetAuthorizationToken",
-      "ecr:InitiateLayerUpload",
-      "ecr:PutImage",
-      "ecr:UploadLayerPart",
-      "ecs:RunTask",
       "iam:PassRole",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "ssm:GetParameters",
-      "secretsmanager:GetSecretValue",
     ], var.extra_permissions))
 
     effect = "Allow"
@@ -193,6 +191,8 @@ data "aws_iam_policy_document" "permissions" {
     }
   }
 }
+
+
 
 data "aws_iam_policy_document" "vpc_permissions" {
   count = module.this.enabled && var.vpc_config != {} ? 1 : 0
@@ -293,7 +293,7 @@ resource "aws_codebuild_source_credential" "authorization" {
 
 resource "aws_codebuild_project" "default" {
   count                  = module.this.enabled ? 1 : 0
-  name                   = module.this.id
+  name                   = var.project_name
   description            = var.description
   concurrent_build_limit = var.concurrent_build_limit
   service_role           = join("", aws_iam_role.default.*.arn)
@@ -325,7 +325,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
@@ -410,14 +410,6 @@ resource "aws_codebuild_project" "default" {
     location            = var.source_location
     report_build_status = var.report_build_status
     git_clone_depth     = var.git_clone_depth != null ? var.git_clone_depth : null
-
-    dynamic "auth" {
-      for_each = var.private_repository ? [""] : []
-      content {
-        type     = "OAUTH"
-        resource = join("", aws_codebuild_source_credential.authorization.*.id)
-      }
-    }
 
     dynamic "git_submodules_config" {
       for_each = var.fetch_git_submodules ? [""] : []
