@@ -330,3 +330,30 @@ variable "project_name" {
   type        = string
   description = "Name of the codebuild project."
 }
+
+variable "enable_github_authentication" {
+  description = <<EOF
+    Whether to enable Github authentication using Personal Access token.
+    If true, it uses the github_token  and github_token_type must be of type SECRETS_MANAGER to authenticate
+  EOF
+  type        = bool
+  default     = false
+}
+
+variable "create_webhooks" {
+  description = "Whether to create webhooks for Github, GitHub Enterprise or Bitbucket"
+  type        = bool
+  default     = false
+}
+
+variable "webhook_build_type" {
+  description = "Webhook build type. Choose between BUILD or BUILD_BATCH"
+  type        = string
+  default     = "BUILD"
+}
+
+variable "webhook_filters" {
+  description = "Filters supported by webhook. EVENT, BASE_REF, HEAD_REF, ACTOR_ACCOUNT_ID, FILE_PATH, COMMIT_MESSAGE"
+  type        = map(string)
+  default     = {}
+}

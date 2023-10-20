@@ -104,12 +104,12 @@ resource "aws_iam_role" "default" {
   dynamic "inline_policy" {
     for_each = var.codebuild_iam != null ? [1] : []
     content {
-      name = var.project_name
+      name   = var.project_name
       policy = var.codebuild_iam
     }
   }
 
-  tags                  = module.this.tags
+  tags = module.this.tags
 }
 
 data "aws_iam_policy_document" "role" {
@@ -475,6 +475,47 @@ resource "aws_codebuild_project" "default" {
       mount_options = lookup(file_system_locations.value, "mount_options", null)
       mount_point   = lookup(file_system_locations.value, "mount_point", null)
       type          = lookup(file_system_locations.value, "type", null)
+    }
+  }
+}
+
+# Pull the github_token from the Secrets Manager
+data "aws_secretsmanager_secret" "secret" {
+  count = var.enable_github_authentication ? 1 : 0
+
+  arn = var.github_token
+}
+
+data "aws_secretsmanager_secret_version" "current_secret" {
+  count = var.enable_github_authentication ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.secret[0].id
+}
+
+# Aunthenticate with Github
+resource "aws_codebuild_source_credential" "github_authentication" {
+  count       = var.enable_github_authentication ? 1 : 0
+  auth_type   = "PERSONAL_ACCESS_TOKEN"
+  server_type = "GITHUB"
+  token       = data.aws_secretsmanager_secret_version.current_secret[0].secret_string
+}
+
+# Set up webhook for Github, Bitbucket
+resource "aws_codebuild_webhook" "webhook" {
+  count = var.create_webhooks ? 1 : 0
+
+  project_name = aws_codebuild_project.default[0].name
+  build_type   = var.webhook_build_type
+  dynamic "filter_group" {
+    for_each = length(var.webhook_filters) > 0 ? [1] : []
+    content {
+      dynamic "filter" {
+        for_each = var.webhook_filters
+        content {
+          type    = filter.key
+          pattern = filter.value
+        }
+      }
     }
   }
 }
