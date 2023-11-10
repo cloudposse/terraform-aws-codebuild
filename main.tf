@@ -21,7 +21,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "default" {
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
   rule {
-    id      = "codebuildcache"
+    id     = "codebuildcache"
     status = "Enabled"
 
     filter {
