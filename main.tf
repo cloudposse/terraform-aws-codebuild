@@ -411,14 +411,6 @@ resource "aws_codebuild_project" "default" {
     report_build_status = var.report_build_status
     git_clone_depth     = var.git_clone_depth != null ? var.git_clone_depth : null
 
-    dynamic "auth" {
-      for_each = var.private_repository ? [""] : []
-      content {
-        type     = "OAUTH"
-        resource = join("", aws_codebuild_source_credential.authorization[*].id)
-      }
-    }
-
     dynamic "git_submodules_config" {
       for_each = var.fetch_git_submodules ? [""] : []
       content {
