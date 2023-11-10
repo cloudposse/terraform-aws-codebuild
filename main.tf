@@ -16,6 +16,22 @@ resource "aws_s3_bucket_versioning" "default" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle" "example_lifecycle" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  rule {
+    id      = "codebuildcache"
+    enabled = true
+
+    prefix = "/"
+    
+    expiration {
+      days = var.cache_expiration_days
+    }
+  }
+}
+
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
@@ -30,18 +46,6 @@ resource "aws_s3_bucket" "cache_bucket" {
     content {
       target_bucket = var.access_log_bucket_name
       target_prefix = "logs/${module.this.id}/"
-    }
-  }
-
-  lifecycle_rule {
-    id      = "codebuildcache"
-    enabled = true
-
-    prefix = "/"
-    tags   = module.this.tags
-
-    expiration {
-      days = var.cache_expiration_days
     }
   }
 
