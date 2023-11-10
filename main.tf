@@ -4,7 +4,7 @@ data "aws_region" "default" {}
 
 resource "aws_s3_bucket_acl" "default" {
   bucket = aws_s3_bucket.cache_bucket.id
-  acl = "private"
+  acl    = "private"
 }
 
 resource "aws_s3_bucket" "cache_bucket" {
