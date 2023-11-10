@@ -43,7 +43,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   }
 }
 
-resource "aws_s3_bucket_logging" "example_logging" {
+resource "aws_s3_bucket_logging" "default" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
@@ -56,7 +56,7 @@ resource "aws_s3_bucket_logging" "example_logging" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "access_good_1" {
+resource "aws_s3_bucket_public_access_block" "default" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
