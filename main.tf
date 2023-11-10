@@ -16,15 +16,17 @@ resource "aws_s3_bucket_versioning" "default" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle" "default" {
+resource "aws_s3_bucket_lifecycle_configuration" "default" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
   rule {
     id      = "codebuildcache"
-    enabled = true
+    status = "Enabled"
 
-    prefix = "/"
+    filter {
+      prefix = "/"
+    }
 
     expiration {
       days = var.cache_expiration_days
