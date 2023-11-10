@@ -25,7 +25,7 @@ resource "aws_s3_bucket_lifecycle" "default" {
     enabled = true
 
     prefix = "/"
-    
+
     expiration {
       days = var.cache_expiration_days
     }
