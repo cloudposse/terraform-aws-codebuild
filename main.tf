@@ -3,6 +3,7 @@ data "aws_caller_identity" "default" {}
 data "aws_region" "default" {}
 
 resource "aws_s3_bucket_acl" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = aws_s3_bucket.cache_bucket.id
   acl    = "private"
 }
