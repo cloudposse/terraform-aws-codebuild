@@ -59,7 +59,7 @@ resource "random_string" "bucket_prefix" {
 }
 
 locals {
-  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix.*.result)}" : ""}"
+  cache_bucket_name = "${module.this.id}${var.cache_bucket_suffix_enabled ? "-${join("", random_string.bucket_prefix[*].result)}" : ""}"
 
   ## Clean up the bucket name to use only hyphens, and trim its length to 63 characters.
   ## As per https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
@@ -71,7 +71,7 @@ locals {
 
   s3_cache_enabled       = var.cache_type == "S3"
   create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
-  s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket.*.bucket) : var.s3_cache_bucket_name
+  s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket[*].bucket) : var.s3_cache_bucket_name
 
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
@@ -134,7 +134,7 @@ resource "aws_iam_policy" "default_cache_bucket" {
 
   name   = "${module.this.id}-cache-bucket"
   path   = var.iam_policy_path
-  policy = join("", data.aws_iam_policy_document.permissions_cache_bucket.*.json)
+  policy = join("", data.aws_iam_policy_document.permissions_cache_bucket[*].json)
   tags   = module.this.tags
 }
 
@@ -187,8 +187,8 @@ data "aws_iam_policy_document" "permissions" {
       effect = "Allow"
 
       resources = [
-        join("", data.aws_s3_bucket.secondary_artifact.*.arn),
-        "${join("", data.aws_s3_bucket.secondary_artifact.*.arn)}/*",
+        join("", data.aws_s3_bucket.secondary_artifact[*].arn),
+        "${join("", data.aws_s3_bucket.secondary_artifact[*].arn)}/*",
       ]
     }
   }
@@ -248,8 +248,8 @@ data "aws_iam_policy_document" "vpc_permissions" {
 
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
-    join("", data.aws_iam_policy_document.permissions.*.json),
-    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions.*.json) : null
+    join("", data.aws_iam_policy_document.permissions[*].json),
+    var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions[*].json) : null
   ])
 }
 
@@ -265,22 +265,22 @@ data "aws_iam_policy_document" "permissions_cache_bucket" {
     effect = "Allow"
 
     resources = [
-      join("", aws_s3_bucket.cache_bucket.*.arn),
-      "${join("", aws_s3_bucket.cache_bucket.*.arn)}/*",
+      join("", aws_s3_bucket.cache_bucket[*].arn),
+      "${join("", aws_s3_bucket.cache_bucket[*].arn)}/*",
     ]
   }
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
   count      = module.this.enabled ? 1 : 0
-  policy_arn = join("", aws_iam_policy.default.*.arn)
-  role       = join("", aws_iam_role.default.*.id)
+  policy_arn = join("", aws_iam_policy.default[*].arn)
+  role       = join("", aws_iam_role.default[*].id)
 }
 
 resource "aws_iam_role_policy_attachment" "default_cache_bucket" {
   count      = module.this.enabled && local.s3_cache_enabled ? 1 : 0
-  policy_arn = join("", aws_iam_policy.default_cache_bucket.*.arn)
-  role       = join("", aws_iam_role.default.*.id)
+  policy_arn = join("", aws_iam_policy.default_cache_bucket[*].arn)
+  role       = join("", aws_iam_role.default[*].id)
 }
 
 resource "aws_codebuild_source_credential" "authorization" {
@@ -296,7 +296,7 @@ resource "aws_codebuild_project" "default" {
   name                   = module.this.id
   description            = var.description
   concurrent_build_limit = var.concurrent_build_limit
-  service_role           = join("", aws_iam_role.default.*.arn)
+  service_role           = join("", aws_iam_role.default[*].arn)
   badge_enabled          = var.badge_enabled
   build_timeout          = var.build_timeout
   source_version         = var.source_version != "" ? var.source_version : null
@@ -325,7 +325,7 @@ resource "aws_codebuild_project" "default" {
       type                = "S3"
       location            = var.secondary_artifact_location
       artifact_identifier = var.secondary_artifact_identifier
-      encryption_disabled = ! var.secondary_artifact_encryption_enabled
+      encryption_disabled = !var.secondary_artifact_encryption_enabled
       # According to AWS documention, in order to have the artifacts written
       # to the root of the bucket, the 'namespace_type' should be 'NONE'
       # (which is the default), 'name' should be '/', and 'path' should be
@@ -410,14 +410,6 @@ resource "aws_codebuild_project" "default" {
     location            = var.source_location
     report_build_status = var.report_build_status
     git_clone_depth     = var.git_clone_depth != null ? var.git_clone_depth : null
-
-    dynamic "auth" {
-      for_each = var.private_repository ? [""] : []
-      content {
-        type     = "OAUTH"
-        resource = join("", aws_codebuild_source_credential.authorization.*.id)
-      }
-    }
 
     dynamic "git_submodules_config" {
       for_each = var.fetch_git_submodules ? [""] : []
