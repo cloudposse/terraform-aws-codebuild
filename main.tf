@@ -9,8 +9,8 @@ resource "aws_s3_bucket_acl" "default" {
 }
 
 resource "aws_s3_bucket_versioning" "default" {
-  count   = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
-  bucket  = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
   versioning_configuration {
     status = "Enabled"
   }
