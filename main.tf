@@ -12,8 +12,9 @@ resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
   rule {
-    object_ownership = "ObjectWriter"
+    object_ownership = "BucketOwnerEnforced"
   }
+  depends_on = [ aws_s3_bucket_acl.default[count.index] ]
 }
 
 resource "aws_s3_bucket_versioning" "default" {
