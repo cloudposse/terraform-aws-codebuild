@@ -8,6 +8,12 @@ resource "aws_s3_bucket_acl" "default" {
   acl    = "private"
 }
 
+resource "aws_bucket_versioning" "default" {
+  count   = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket  = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  enabled = var.versioning_enabled
+}
+
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
@@ -16,10 +22,6 @@ resource "aws_s3_bucket" "cache_bucket" {
   bucket        = local.cache_bucket_name_normalised
   force_destroy = true
   tags          = module.this.tags
-
-  versioning {
-    enabled = var.versioning_enabled
-  }
 
   dynamic "logging" {
     for_each = var.access_log_bucket_name != "" ? [1] : []
