@@ -8,6 +8,14 @@ resource "aws_s3_bucket_acl" "default" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
+
 resource "aws_s3_bucket_versioning" "default" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
