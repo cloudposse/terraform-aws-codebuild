@@ -16,7 +16,7 @@ resource "aws_s3_bucket_versioning" "default" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle" "example_lifecycle" {
+resource "aws_s3_bucket_lifecycle" "default" {
   count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
@@ -32,14 +32,20 @@ resource "aws_s3_bucket_lifecycle" "example_lifecycle" {
   }
 }
 
-resource "aws_s3_bucket" "cache_bucket" {
-  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
-  #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
-  #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
-  count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
-  bucket        = local.cache_bucket_name_normalised
-  force_destroy = true
-  tags          = module.this.tags
+resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "example_logging" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
 
   dynamic "logging" {
     for_each = var.access_log_bucket_name != "" ? [1] : []
@@ -48,18 +54,16 @@ resource "aws_s3_bucket" "cache_bucket" {
       target_prefix = "logs/${module.this.id}/"
     }
   }
+}
 
-  dynamic "server_side_encryption_configuration" {
-    for_each = var.encryption_enabled ? ["true"] : []
-
-    content {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm = "AES256"
-        }
-      }
-    }
-  }
+resource "aws_s3_bucket" "cache_bucket" {
+  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
+  #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
+  #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
+  count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket        = local.cache_bucket_name_normalised
+  force_destroy = true
+  tags          = module.this.tags
 }
 
 resource "random_string" "bucket_prefix" {
