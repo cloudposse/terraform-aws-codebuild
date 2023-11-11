@@ -2,51 +2,84 @@ data "aws_caller_identity" "default" {}
 
 data "aws_region" "default" {}
 
+resource "aws_s3_bucket_acl" "default" {
+  count      = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket     = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  acl        = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership]
+}
+
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  rule {
+    id     = "codebuildcache"
+    status = "Enabled"
+
+    filter {
+      prefix = "/"
+    }
+
+    expiration {
+      days = var.cache_expiration_days
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket && var.access_log_bucket_name != "" ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  target_bucket = var.access_log_bucket_name
+  target_prefix = "logs/${module.this.id}/"
+}
+
+resource "aws_s3_bucket_public_access_block" "default" {
+  count  = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
+  bucket = join("", resource.aws_s3_bucket.cache_bucket[*].id)
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket" "cache_bucket" {
   #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=BC_AWS_S3_14:Skipping `Ensure all data stored in the S3 bucket is securely encrypted at rest` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
   #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
   count         = module.this.enabled && local.create_s3_cache_bucket ? 1 : 0
   bucket        = local.cache_bucket_name_normalised
-  acl           = "private"
   force_destroy = true
   tags          = module.this.tags
-
-  versioning {
-    enabled = var.versioning_enabled
-  }
-
-  dynamic "logging" {
-    for_each = var.access_log_bucket_name != "" ? [1] : []
-    content {
-      target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
-    }
-  }
-
-  lifecycle_rule {
-    id      = "codebuildcache"
-    enabled = true
-
-    prefix = "/"
-    tags   = module.this.tags
-
-    expiration {
-      days = var.cache_expiration_days
-    }
-  }
-
-  dynamic "server_side_encryption_configuration" {
-    for_each = var.encryption_enabled ? ["true"] : []
-
-    content {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm = "AES256"
-        }
-      }
-    }
-  }
 }
 
 resource "random_string" "bucket_prefix" {
