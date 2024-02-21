@@ -28,8 +28,7 @@ func TestExamplesVPC(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	projectName := terraform.Output(t, terraformOptions, "project_name")
 
-	expectedProjectName := "eg-test-codebuild-test"
+	expectedProjectName := "eg-test-codebuild-vpc"
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedProjectName, projectName)
-
 }
