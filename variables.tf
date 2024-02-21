@@ -254,10 +254,27 @@ variable "logs_config" {
   description = "Configuration for the builds to store log data to CloudWatch or S3."
 }
 
+variable "default_permissions_enabled" {
+  type        = bool
+  default     = true
+  description = "When 'true' default base IAM permissions to get up and running with CodeBuild are attached. Those who want a least privileged policy can instead set to `false` and use the `custom_policy` variable."
+}
+
 variable "extra_permissions" {
-  type        = list(any)
+  type        = list(string)
   default     = []
-  description = "List of action strings which will be added to IAM service account permissions."
+  description = "List of action strings which will be added to IAM service account permissions. Only used if `default_permissions_enabled` is set to true."
+}
+
+variable "custom_policy" {
+  type        = list(string)
+  description = "JSON encoded IAM policy to add to the IAM service account permissions."
+  default     = []
+
+  validation {
+    condition     = length(var.custom_policy) <= 1
+    error_message = "Only 1 custom policy can be included."
+  }
 }
 
 variable "iam_role_path" {

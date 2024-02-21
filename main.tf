@@ -193,31 +193,35 @@ data "aws_s3_bucket" "secondary_artifact" {
 data "aws_iam_policy_document" "permissions" {
   count = module.this.enabled ? 1 : 0
 
-  statement {
-    sid = ""
+  dynamic "statement" {
+    for_each = var.default_permissions_enabled ? [1] : []
 
-    actions = compact(concat([
-      "codecommit:GitPull",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:CompleteLayerUpload",
-      "ecr:GetAuthorizationToken",
-      "ecr:InitiateLayerUpload",
-      "ecr:PutImage",
-      "ecr:UploadLayerPart",
-      "ecs:RunTask",
-      "iam:PassRole",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "ssm:GetParameters",
-      "secretsmanager:GetSecretValue",
-    ], var.extra_permissions))
+    content {
+      sid = ""
 
-    effect = "Allow"
+      actions = compact(concat([
+        "codecommit:GitPull",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetAuthorizationToken",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart",
+        "ecs:RunTask",
+        "iam:PassRole",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "ssm:GetParameters",
+        "secretsmanager:GetSecretValue",
+      ], var.extra_permissions))
 
-    resources = [
-      "*",
-    ]
+      effect = "Allow"
+
+      resources = [
+        "*",
+      ]
+    }
   }
 
   dynamic "statement" {
@@ -237,6 +241,16 @@ data "aws_iam_policy_document" "permissions" {
         join("", data.aws_s3_bucket.secondary_artifact[*].arn),
         "${join("", data.aws_s3_bucket.secondary_artifact[*].arn)}/*",
       ]
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(var.extra_permissions) > 0 ? var.default_permissions_enabled : true
+      error_message = <<-EOT
+      Extra permissions can only be attached to the default permissions policy statement.
+      Either set `default_permissions_enabled` to true or use `custom_policy` to set a least privileged policy."
+      EOT
     }
   }
 }
@@ -295,6 +309,7 @@ data "aws_iam_policy_document" "vpc_permissions" {
 
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
+    join("", var.custom_policy),
     join("", data.aws_iam_policy_document.permissions[*].json),
     var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions[*].json) : null
   ])
