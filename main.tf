@@ -106,6 +106,9 @@ locals {
   create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
   s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket[*].bucket) : var.s3_cache_bucket_name
 
+  aws_region     = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+  aws_account_id = signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id
+
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
   ## aws_codebuild_project
@@ -148,6 +151,17 @@ data "aws_iam_policy_document" "role" {
     principals {
       type        = "Service"
       identifiers = ["codebuild.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      # to avoid cyclic dependencies with codebuild, we can't reference
+      # the resources arn directly instead we interpolate the arn using known values
+      values = [
+        "arn:aws:codebuild:${local.aws_region}:${local.aws_account_id}:project/${module.this.id}"
+      ]
     }
 
     effect = "Allow"
@@ -256,14 +270,14 @@ data "aws_iam_policy_document" "vpc_permissions" {
     ]
 
     resources = [
-      "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*"
+      "arn:aws:ec2:${local.aws_region}:${local.aws_account_id}:network-interface/*"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "ec2:Subnet"
       values = formatlist(
-        "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/%s",
+        "arn:aws:ec2:${local.aws_region}:${local.aws_account_id}:subnet/%s",
         var.vpc_config.subnets
       )
     }
@@ -385,12 +399,12 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       name  = "AWS_REGION"
-      value = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+      value = local.aws_region
     }
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id
+      value = local.aws_account_id
     }
 
     dynamic "environment_variable" {
