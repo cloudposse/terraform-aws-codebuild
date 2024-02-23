@@ -106,6 +106,9 @@ locals {
   create_s3_cache_bucket = local.s3_cache_enabled && var.s3_cache_bucket_name == null
   s3_bucket_name         = local.create_s3_cache_bucket ? join("", aws_s3_bucket.cache_bucket[*].bucket) : var.s3_cache_bucket_name
 
+  aws_region     = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+  aws_account_id = signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id
+
   ## This is the magic where a map of a list of maps is generated
   ## and used to conditionally add the cache bucket option to the
   ## aws_codebuild_project
@@ -150,6 +153,17 @@ data "aws_iam_policy_document" "role" {
       identifiers = ["codebuild.amazonaws.com"]
     }
 
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      # to avoid cyclic dependencies with codebuild, we can't reference
+      # the resources arn directly instead we interpolate the arn using known values
+      values = [
+        "arn:aws:codebuild:${local.aws_region}:${local.aws_account_id}:project/${module.this.id}"
+      ]
+    }
+
     effect = "Allow"
   }
 }
@@ -179,31 +193,35 @@ data "aws_s3_bucket" "secondary_artifact" {
 data "aws_iam_policy_document" "permissions" {
   count = module.this.enabled ? 1 : 0
 
-  statement {
-    sid = ""
+  dynamic "statement" {
+    for_each = var.default_permissions_enabled ? [1] : []
 
-    actions = compact(concat([
-      "codecommit:GitPull",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:CompleteLayerUpload",
-      "ecr:GetAuthorizationToken",
-      "ecr:InitiateLayerUpload",
-      "ecr:PutImage",
-      "ecr:UploadLayerPart",
-      "ecs:RunTask",
-      "iam:PassRole",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "ssm:GetParameters",
-      "secretsmanager:GetSecretValue",
-    ], var.extra_permissions))
+    content {
+      sid = ""
 
-    effect = "Allow"
+      actions = compact(concat([
+        "codecommit:GitPull",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetAuthorizationToken",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart",
+        "ecs:RunTask",
+        "iam:PassRole",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "ssm:GetParameters",
+        "secretsmanager:GetSecretValue",
+      ], var.extra_permissions))
 
-    resources = [
-      "*",
-    ]
+      effect = "Allow"
+
+      resources = [
+        "*",
+      ]
+    }
   }
 
   dynamic "statement" {
@@ -223,6 +241,16 @@ data "aws_iam_policy_document" "permissions" {
         join("", data.aws_s3_bucket.secondary_artifact[*].arn),
         "${join("", data.aws_s3_bucket.secondary_artifact[*].arn)}/*",
       ]
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(var.extra_permissions) > 0 ? var.default_permissions_enabled : true
+      error_message = <<-EOT
+      Extra permissions can only be attached to the default permissions policy statement.
+      Either set `default_permissions_enabled` to true or use `custom_policy` to set a least privileged policy."
+      EOT
     }
   }
 }
@@ -256,14 +284,14 @@ data "aws_iam_policy_document" "vpc_permissions" {
     ]
 
     resources = [
-      "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*"
+      "arn:aws:ec2:${local.aws_region}:${local.aws_account_id}:network-interface/*"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "ec2:Subnet"
       values = formatlist(
-        "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/%s",
+        "arn:aws:ec2:${local.aws_region}:${local.aws_account_id}:subnet/%s",
         var.vpc_config.subnets
       )
     }
@@ -281,6 +309,7 @@ data "aws_iam_policy_document" "vpc_permissions" {
 
 data "aws_iam_policy_document" "combined_permissions" {
   override_policy_documents = compact([
+    join("", var.custom_policy),
     join("", data.aws_iam_policy_document.permissions[*].json),
     var.vpc_config != {} ? join("", data.aws_iam_policy_document.vpc_permissions[*].json) : null
   ])
@@ -385,12 +414,12 @@ resource "aws_codebuild_project" "default" {
 
     environment_variable {
       name  = "AWS_REGION"
-      value = signum(length(var.aws_region)) == 1 ? var.aws_region : data.aws_region.default.name
+      value = local.aws_region
     }
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = signum(length(var.aws_account_id)) == 1 ? var.aws_account_id : data.aws_caller_identity.default.account_id
+      value = local.aws_account_id
     }
 
     dynamic "environment_variable" {

@@ -4,7 +4,7 @@ namespace = "eg"
 
 stage = "test"
 
-name = "codebuild-test"
+name = "codebuild-complete"
 
 cache_bucket_suffix_enabled = true
 
