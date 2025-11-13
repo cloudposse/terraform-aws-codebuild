@@ -530,7 +530,7 @@ resource "aws_codebuild_project" "default" {
   }
 
   dynamic "file_system_locations" {
-    for_each = length(var.file_system_locations) > 0 ? [""] : []
+    for_each = var.file_system_locations
     content {
       identifier    = lookup(file_system_locations.value, "identifier", null)
       location      = lookup(file_system_locations.value, "location", null)
